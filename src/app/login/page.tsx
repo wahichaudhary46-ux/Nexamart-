@@ -10,9 +10,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Mail, Lock, LogIn, UserPlus } from "lucide-react";
+import { doc, getDoc } from "firebase/firestore";
+import { useFirestore } from "@/firebase";
 
 export default function LoginPage() {
   const { user, userProfile, loading, signIn, signUp, signInWithGoogle } = useAuthContext();
+  const db = useFirestore();
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [isSignUpMode, setIsSignUpMode] = useState(false);
   const [email, setEmail] = useState("");
@@ -25,6 +28,7 @@ export default function LoginPage() {
     setMounted(true);
   }, []);
 
+  // Handle automatic redirection when state updates
   useEffect(() => {
     if (!loading && user) {
       if (userProfile?.isProfileComplete) {
@@ -34,6 +38,17 @@ export default function LoginPage() {
       }
     }
   }, [user, userProfile, loading, router]);
+
+  const checkUserExistsAndRedirect = async (uid: string) => {
+    const docRef = doc(db, "users", uid);
+    const docSnap = await getDoc(docRef);
+    
+    if (docSnap.exists() && docSnap.data()?.isProfileComplete) {
+      router.push("/dashboard");
+    } else {
+      router.push("/onboarding");
+    }
+  };
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,12 +69,17 @@ export default function LoginPage() {
           title: "Account Created",
           description: "Welcome to NexaMart! Let's set up your profile.",
         });
+        // New signups always go to onboarding
+        router.push("/onboarding");
       } else {
         await signIn(email, password);
         toast({
           title: "Welcome Back",
           description: "Signed in successfully.",
         });
+        // We don't have the UID immediately here because signIn is async but the user state 
+        // update is handled by the provider. However, the useEffect above will handle 
+        // the redirection once the user state is populated. 
       }
     } catch (error: any) {
       let errorMessage = "An unexpected error occurred. Please try again.";
@@ -86,10 +106,8 @@ export default function LoginPage() {
     setIsSigningIn(true);
     try {
       await signInWithGoogle();
-      // Manual redirect after 2 seconds
-      setTimeout(() => {
-        router.push("/onboarding");
-      }, 2000);
+      // The getRedirectResult in AuthProvider will handle the actual sign-in.
+      // We rely on the useEffect for redirection to avoid race conditions.
     } catch (error: any) {
       console.error(error);
       setIsSigningIn(false);
@@ -98,7 +116,7 @@ export default function LoginPage() {
         toast({
           variant: "destructive",
           title: "Domain Not Authorized",
-          description: "This domain is not authorized in the Firebase Console. Please add it to your Authorized Domains.",
+          description: "This domain is not authorized in the Firebase Console.",
         });
       } else {
         toast({
