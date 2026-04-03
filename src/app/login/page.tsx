@@ -58,7 +58,7 @@ export default function LoginPage() {
             <div className="relative">
               <Image
                 src="/1000128270.png"
-                alt="NexaMart Logo"
+                alt="NexaMart"
                 width={220}
                 height={80}
                 className="mx-auto object-contain drop-shadow-md"
