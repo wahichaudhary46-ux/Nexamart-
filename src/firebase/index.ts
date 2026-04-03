@@ -4,12 +4,15 @@ import { getFirestore, Firestore } from 'firebase/firestore';
 import { getAuth, Auth } from 'firebase/auth';
 import { firebaseConfig } from './config';
 
+/**
+ * Initializes the Firebase App, Firestore, and Auth instances as a singleton.
+ * This ensures that multiple initializations do not occur on the client.
+ */
 export function initializeFirebase(): {
   firebaseApp: FirebaseApp;
   firestore: Firestore;
   auth: Auth;
 } {
-  // Ensure we only initialize once
   const firebaseApp = getApps().length > 0 
     ? getApp() 
     : initializeApp(firebaseConfig);
