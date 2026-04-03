@@ -115,7 +115,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       updatedAt: serverTimestamp(),
     };
 
-    await setDoc(docRef, initialProfile);
+    // Follow mutation pattern: no await, chain catch with permission error emitter
+    setDoc(docRef, initialProfile).catch(async (error: any) => {
+      if (error.code === 'permission-denied') {
+        const permissionError = new FirestorePermissionError({
+          path: docRef.path,
+          operation: 'create',
+          requestResourceData: initialProfile,
+        });
+        errorEmitter.emit('permission-error', permissionError);
+      }
+    });
+    
     setUserProfile(initialProfile);
   };
 
@@ -134,12 +145,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       updatedAt: serverTimestamp(),
     };
 
+    // Follow mutation pattern: no await, chain catch with permission error emitter
     setDoc(docRef, profileData, { merge: true })
-      .then(async () => {
-        const updatedProfile = await fetchUserProfile(firebaseUser.uid);
-        setUserProfile(updatedProfile);
-      })
-      .catch(async (error) => {
+      .catch(async (error: any) => {
         if (error.code === 'permission-denied') {
           const permissionError = new FirestorePermissionError({
             path: docRef.path,
@@ -148,8 +156,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           });
           errorEmitter.emit('permission-error', permissionError);
         }
-        throw error;
       });
+
+    // Optimistically update local state
+    setUserProfile((prev) => prev ? { ...prev, ...data } : null);
   };
 
   const userContextValue = firebaseUser ? {
