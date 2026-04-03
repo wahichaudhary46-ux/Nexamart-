@@ -57,12 +57,13 @@ export default function LoginPage() {
           <div className="flex justify-center mb-10">
             <div className="relative">
               <Image
-                src="/logo.png"
+                src="https://kommodo.ai/i/JOcih1ioLO78eqWEtcdO"
                 alt="NexaMart"
                 width={220}
                 height={80}
                 className="mx-auto object-contain"
                 priority
+                unoptimized
               />
             </div>
           </div>
@@ -152,7 +153,7 @@ export default function LoginPage() {
 function LoadingSpinner() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50">
-      <Spinner className="h-8 w-8" />
+      <Spinner className="h-8 w-8 text-primary" />
     </div>
   );
 }
