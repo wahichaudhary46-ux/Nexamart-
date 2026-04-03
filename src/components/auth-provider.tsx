@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -7,9 +8,15 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { GoogleAuthProvider, signInWithRedirect, getRedirectResult, signOut as firebaseSignOut } from "firebase/auth";
-import { doc, getDoc, setDoc } from "firebase/firestore";
-import { useAuth, useFirestore, useUser } from "@/firebase";
+import { 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword,
+  signOut as firebaseSignOut,
+  onAuthStateChanged,
+  User
+} from "firebase/auth";
+import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
+import { useAuth, useFirestore } from "@/firebase";
 import { errorEmitter } from "@/firebase/error-emitter";
 import { FirestorePermissionError } from "@/firebase/errors";
 
@@ -22,6 +29,7 @@ export interface UserProfile {
   address: string;
   photoURL: string | null;
   createdAt: any;
+  updatedAt: any;
   isProfileComplete: boolean;
 }
 
@@ -36,7 +44,8 @@ interface AuthContextType {
   user: FirebaseUser | null;
   userProfile: UserProfile | null;
   loading: boolean;
-  signInWithGoogle: () => Promise<void>;
+  signIn: (email: string, pass: string) => Promise<void>;
+  signUp: (email: string, pass: string) => Promise<void>;
   signOut: () => Promise<void>;
   updateUserProfile: (data: Partial<UserProfile>) => Promise<void>;
 }
@@ -46,10 +55,9 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const auth = useAuth();
   const db = useFirestore();
-  const { user: firebaseUser, loading: authLoading } = useUser();
+  const [firebaseUser, setFirebaseUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [profileLoading, setProfileLoading] = useState(true);
-  const [isRedirecting, setIsRedirecting] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   const fetchUserProfile = async (uid: string): Promise<UserProfile | null> => {
     const docRef = doc(db, "users", uid);
@@ -67,72 +75,53 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
         errorEmitter.emit('permission-error', permissionError);
       }
-      console.error("Error fetching user profile:", error);
       return null;
     }
   };
 
   useEffect(() => {
-    // Handle the result of the redirect sign-in on mount
-    let mounted = true;
-    
-    getRedirectResult(auth)
-      .then((result) => {
-        if (mounted) {
-          setIsRedirecting(false);
-          if (result?.user) {
-            console.log("Successfully signed in via redirect:", result.user.email);
-          }
-        }
-      })
-      .catch((error) => {
-        if (mounted) {
-          console.error("Error handling redirect result:", error);
-          setIsRedirecting(false);
-        }
-      });
-
-    return () => {
-      mounted = false;
-    };
-  }, [auth]);
-
-  useEffect(() => {
-    async function initProfile() {
-      if (firebaseUser) {
-        const profile = await fetchUserProfile(firebaseUser.uid);
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      setFirebaseUser(user);
+      if (user) {
+        const profile = await fetchUserProfile(user.uid);
         setUserProfile(profile);
       } else {
         setUserProfile(null);
       }
-      setProfileLoading(false);
-    }
-    
-    // Only fetch profile once auth state is settled and we're not handling a redirect
-    if (!authLoading && !isRedirecting) {
-      initProfile();
-    }
-  }, [firebaseUser, authLoading, isRedirecting]);
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, [auth, db]);
 
-  const signInWithGoogle = async () => {
-    try {
-      const provider = new GoogleAuthProvider();
-      // Use redirect instead of popup to avoid browser blocks
-      await signInWithRedirect(auth, provider);
-    } catch (error) {
-      console.error("Error signing in with Google redirect:", error);
-      throw error;
-    }
+  const signIn = async (email: string, pass: string) => {
+    await signInWithEmailAndPassword(auth, email, pass);
+  };
+
+  const signUp = async (email: string, pass: string) => {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+    const uid = userCredential.user.uid;
+    const docRef = doc(db, "users", uid);
+    
+    const initialProfile: UserProfile = {
+      uid,
+      email,
+      fullName: "",
+      mobileNumber: "",
+      city: "",
+      address: "",
+      photoURL: null,
+      isProfileComplete: false,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    };
+
+    await setDoc(docRef, initialProfile);
+    setUserProfile(initialProfile);
   };
 
   const signOut = async () => {
-    try {
-      await firebaseSignOut(auth);
-      setUserProfile(null);
-    } catch (error) {
-      console.error("Error signing out:", error);
-      throw error;
-    }
+    await firebaseSignOut(auth);
+    setUserProfile(null);
   };
 
   const updateUserProfile = async (data: Partial<UserProfile>) => {
@@ -142,8 +131,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       ...data,
       uid: firebaseUser.uid,
       email: firebaseUser.email,
-      photoURL: firebaseUser.photoURL,
-      updatedAt: new Date(),
+      updatedAt: serverTimestamp(),
     };
 
     setDoc(docRef, profileData, { merge: true })
@@ -160,7 +148,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           });
           errorEmitter.emit('permission-error', permissionError);
         }
-        console.error("Error updating user profile:", error);
         throw error;
       });
   };
@@ -176,8 +163,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider value={{ 
       user: userContextValue, 
       userProfile, 
-      loading: authLoading || profileLoading || isRedirecting, 
-      signInWithGoogle, 
+      loading, 
+      signIn, 
+      signUp,
       signOut, 
       updateUserProfile 
     }}>
