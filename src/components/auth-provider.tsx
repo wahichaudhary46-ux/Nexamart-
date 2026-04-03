@@ -49,6 +49,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const { user: firebaseUser, loading: authLoading } = useUser();
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [profileLoading, setProfileLoading] = useState(true);
+  const [isRedirecting, setIsRedirecting] = useState(true);
 
   const fetchUserProfile = async (uid: string): Promise<UserProfile | null> => {
     const docRef = doc(db, "users", uid);
@@ -72,6 +73,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
+    // Handle the result of the redirect sign-in on mount
+    let mounted = true;
+    
+    getRedirectResult(auth)
+      .then((result) => {
+        if (mounted) {
+          setIsRedirecting(false);
+          if (result?.user) {
+            console.log("Successfully signed in via redirect:", result.user.email);
+          }
+        }
+      })
+      .catch((error) => {
+        if (mounted) {
+          console.error("Error handling redirect result:", error);
+          setIsRedirecting(false);
+        }
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, [auth]);
+
+  useEffect(() => {
     async function initProfile() {
       if (firebaseUser) {
         const profile = await fetchUserProfile(firebaseUser.uid);
@@ -81,17 +107,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       setProfileLoading(false);
     }
-    if (!authLoading) {
+    
+    // Only fetch profile once auth state is settled and we're not handling a redirect
+    if (!authLoading && !isRedirecting) {
       initProfile();
     }
-  }, [firebaseUser, authLoading]);
-
-  useEffect(() => {
-    // Handle the result of the redirect sign-in
-    getRedirectResult(auth).catch((error) => {
-      console.error("Error handling redirect result:", error);
-    });
-  }, [auth]);
+  }, [firebaseUser, authLoading, isRedirecting]);
 
   const signInWithGoogle = async () => {
     try {
@@ -155,7 +176,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider value={{ 
       user: userContextValue, 
       userProfile, 
-      loading: authLoading || profileLoading, 
+      loading: authLoading || profileLoading || isRedirecting, 
       signInWithGoogle, 
       signOut, 
       updateUserProfile 
