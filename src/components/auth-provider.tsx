@@ -7,7 +7,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { GoogleAuthProvider, signInWithPopup, signOut as firebaseSignOut } from "firebase/auth";
+import { GoogleAuthProvider, signInWithRedirect, getRedirectResult, signOut as firebaseSignOut } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { useAuth, useFirestore, useUser } from "@/firebase";
 import { errorEmitter } from "@/firebase/error-emitter";
@@ -86,12 +86,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [firebaseUser, authLoading]);
 
+  useEffect(() => {
+    // Handle the result of the redirect sign-in
+    getRedirectResult(auth).catch((error) => {
+      console.error("Error handling redirect result:", error);
+    });
+  }, [auth]);
+
   const signInWithGoogle = async () => {
     try {
       const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
+      // Use redirect instead of popup to avoid browser blocks
+      await signInWithRedirect(auth, provider);
     } catch (error) {
-      console.error("Error signing in with Google:", error);
+      console.error("Error signing in with Google redirect:", error);
       throw error;
     }
   };
