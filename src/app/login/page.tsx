@@ -53,17 +53,16 @@ export default function LoginPage() {
         className="w-full max-w-md"
       >
         <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-200 p-8 md:p-10">
-          {/* Professional Logo Integration */}
+          {/* New Professional Logo */}
           <div className="flex justify-center mb-10">
             <div className="relative">
               <Image
-                src="https://ibb.co/1JYb5jYp"
-                alt="NexaMart"
+                src="/1000128270.png"
+                alt="NexaMart Logo"
                 width={220}
                 height={80}
-                className="mx-auto object-contain"
+                className="mx-auto object-contain drop-shadow-md"
                 priority
-                unoptimized
               />
             </div>
           </div>
@@ -115,15 +114,15 @@ export default function LoginPage() {
             <div className="flex flex-wrap justify-center gap-y-4 gap-x-6">
               <div className="flex items-center gap-2 text-slate-600">
                 <MapPin className="w-4 h-4 text-primary" />
-                <span className="text-[13px] font-semibold">Local Availability</span>
+                <span className="text-[13px] font-semibold text-slate-700">Local Availability</span>
               </div>
               <div className="flex items-center gap-2 text-slate-600">
                 <ShoppingBag className="w-4 h-4 text-primary" />
-                <span className="text-[13px] font-semibold">A to Z Products</span>
+                <span className="text-[13px] font-semibold text-slate-700">A to Z Products</span>
               </div>
               <div className="flex items-center gap-2 text-slate-600">
                 <Search className="w-4 h-4 text-primary" />
-                <span className="text-[13px] font-semibold">Easy Discovery</span>
+                <span className="text-[13px] font-semibold text-slate-700">Easy Discovery</span>
               </div>
             </div>
           </div>
@@ -135,9 +134,9 @@ export default function LoginPage() {
               <span className="text-[11px] uppercase tracking-widest font-bold">Secure Access</span>
             </div>
             <div className="flex justify-center gap-4 text-[12px] font-semibold">
-              <a href="#" className="text-slate-500 hover:text-primary transition-colors">Terms of Service</a>
-              <span className="text-slate-300">•</span>
-              <a href="#" className="text-slate-500 hover:text-primary transition-colors">Privacy Policy</a>
+              <a href="#" className="text-slate-500 hover:text-primary transition-colors underline-offset-4 hover:underline">Terms of Service</a>
+              <span className="text-slate-300 select-none">•</span>
+              <a href="#" className="text-slate-500 hover:text-primary transition-colors underline-offset-4 hover:underline">Privacy Policy</a>
             </div>
           </div>
         </div>
