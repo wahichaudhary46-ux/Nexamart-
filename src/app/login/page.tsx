@@ -13,7 +13,7 @@ import { Mail, Lock, LogIn, UserPlus } from "lucide-react";
 
 export default function LoginPage() {
   const { user, userProfile, loading, signIn, signUp, signInWithGoogle } = useAuthContext();
-  const [isAuthLoading, setIsAuthLoading] = useState(false);
+  const [isSigningIn, setIsSigningIn] = useState(false);
   const [isSignUpMode, setIsSignUpMode] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -29,7 +29,7 @@ export default function LoginPage() {
     if (!loading && user) {
       if (userProfile?.isProfileComplete) {
         router.push("/dashboard");
-      } else {
+      } else if (userProfile) {
         router.push("/onboarding");
       }
     }
@@ -46,7 +46,7 @@ export default function LoginPage() {
       return;
     }
 
-    setIsAuthLoading(true);
+    setIsSigningIn(true);
     try {
       if (isSignUpMode) {
         await signUp(email, password);
@@ -78,15 +78,22 @@ export default function LoginPage() {
         description: errorMessage,
       });
     } finally {
-      setIsAuthLoading(false);
+      setIsSigningIn(false);
     }
   };
 
   const handleGoogleSignIn = async () => {
-    setIsAuthLoading(true);
+    setIsSigningIn(true);
     try {
       await signInWithGoogle();
+      // Manual redirect after 2 seconds
+      setTimeout(() => {
+        router.push("/onboarding");
+      }, 2000);
     } catch (error: any) {
+      console.error(error);
+      setIsSigningIn(false);
+      
       if (error.code === 'auth/unauthorized-domain') {
         toast({
           variant: "destructive",
@@ -100,8 +107,6 @@ export default function LoginPage() {
           description: error.message || "Could not sign in with Google.",
         });
       }
-    } finally {
-      setIsAuthLoading(false);
     }
   };
 
@@ -184,9 +189,9 @@ export default function LoginPage() {
               <Button
                 type="submit"
                 className="w-full h-12 rounded-xl text-lg font-semibold gap-2 shadow-lg hover:shadow-primary/20 transition-all active:scale-[0.98]"
-                disabled={isAuthLoading}
+                disabled={isSigningIn}
               >
-                {isAuthLoading ? (
+                {isSigningIn ? (
                   <Spinner className="h-5 w-5 text-white" />
                 ) : (
                   <>
@@ -207,7 +212,7 @@ export default function LoginPage() {
               type="button"
               variant="outline"
               onClick={handleGoogleSignIn}
-              disabled={isAuthLoading}
+              disabled={isSigningIn}
               className="w-full h-12 rounded-xl border-border bg-white hover:bg-muted/30 gap-3 font-semibold transition-all shadow-sm"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
