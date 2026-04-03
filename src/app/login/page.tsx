@@ -54,13 +54,13 @@ export default function LoginPage() {
           className="w-full max-w-lg"
         >
           <div className="relative overflow-hidden rounded-[2.5rem] bg-white shadow-2xl">
-            {/* Top decorative bar */}
+            {/* Top decorative bar with brand colors */}
             <div className="h-2 w-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500" />
             
             <div className="p-8 md:p-12">
-              {/* Logo Integration */}
+              {/* Logo Integration - Perfectly Centered & Premium */}
               <div className="flex justify-center mb-10">
-                <div className="relative group transition-transform duration-500 hover:scale-105">
+                <div className="relative transition-transform duration-500 hover:scale-105">
                   <Image 
                     src="/logo.png" 
                     alt="NexaMart" 
@@ -72,12 +72,12 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              <div className="text-center space-y-2 mb-10">
+              <div className="text-center space-y-3 mb-10">
                 <h1 className="text-3xl font-black text-slate-900 tracking-tight">
                   Welcome back
                 </h1>
-                <p className="text-slate-500 font-medium text-lg italic">
-                  Your one-stop destination for premium lifestyle products.
+                <p className="text-slate-500 font-medium text-lg leading-relaxed italic">
+                  Experience the future of premium shopping at your fingertips.
                 </p>
               </div>
 
@@ -118,44 +118,44 @@ export default function LoginPage() {
                 )}
               </button>
 
-              {/* Trust Badges */}
+              {/* Sleek Trust Badges */}
               <div className="mt-12 pt-8 border-t border-slate-100 grid grid-cols-3 gap-4">
-                <div className="flex flex-col items-center text-center gap-2">
-                  <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
-                    <ShieldCheck className="w-5 h-5" />
+                <div className="flex flex-col items-center text-center gap-2 group">
+                  <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 transition-colors group-hover:bg-blue-100">
+                    <ShieldCheck className="w-6 h-6" />
                   </div>
-                  <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">100% Secure</span>
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">100% Secure</span>
                 </div>
-                <div className="flex flex-col items-center text-center gap-2">
-                  <div className="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center text-purple-600">
-                    <Truck className="w-5 h-5" />
+                <div className="flex flex-col items-center text-center gap-2 group">
+                  <div className="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center text-purple-600 transition-colors group-hover:bg-purple-100">
+                    <Truck className="w-6 h-6" />
                   </div>
-                  <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Fast Delivery</span>
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Fast Delivery</span>
                 </div>
-                <div className="flex flex-col items-center text-center gap-2">
-                  <div className="w-10 h-10 rounded-full bg-pink-50 flex items-center justify-center text-pink-600">
-                    <Star className="w-5 h-5" />
+                <div className="flex flex-col items-center text-center gap-2 group">
+                  <div className="w-12 h-12 rounded-2xl bg-pink-50 flex items-center justify-center text-pink-600 transition-colors group-hover:bg-pink-100">
+                    <Star className="w-6 h-6" />
                   </div>
-                  <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Top Quality</span>
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Top Quality</span>
                 </div>
               </div>
 
-              {/* Policy Section */}
-              <div className="mt-12 text-center space-y-4">
-                <div className="flex items-center justify-center gap-4 text-sm font-semibold text-slate-400">
-                  <a href="#" className="hover:text-blue-600 transition-colors">Terms of Service</a>
-                  <span className="w-1 h-1 rounded-full bg-slate-300" />
-                  <a href="#" className="hover:text-blue-600 transition-colors">Privacy Policy</a>
+              {/* Policy Section - Professional & Visible */}
+              <div className="mt-12 space-y-4 text-center">
+                <div className="flex items-center justify-center gap-4 text-xs font-bold text-slate-400">
+                  <a href="#" className="hover:text-blue-600 transition-colors uppercase tracking-widest">Terms of Service</a>
+                  <span className="w-1.5 h-1.5 rounded-full bg-slate-200" />
+                  <a href="#" className="hover:text-blue-600 transition-colors uppercase tracking-widest">Privacy Policy</a>
                 </div>
-                <p className="text-xs text-slate-400 leading-relaxed max-w-[280px] mx-auto">
-                  By signing in, you agree to our policies regarding data usage and secure transactions.
+                <p className="text-[11px] text-slate-400 leading-relaxed max-w-[320px] mx-auto font-medium">
+                  Your security is our priority. By signing in, you agree to NexaMart's data protection and service excellence policies.
                 </p>
               </div>
             </div>
           </div>
           
           <p className="mt-8 text-center text-white/50 text-sm font-medium">
-            Need help? <a href="#" className="text-white hover:underline">Contact Support</a>
+            Need assistance? <a href="#" className="text-white hover:underline transition-all">Contact Support</a>
           </p>
         </motion.div>
       </div>
