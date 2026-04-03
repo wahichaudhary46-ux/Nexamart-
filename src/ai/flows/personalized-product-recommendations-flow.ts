@@ -39,7 +39,7 @@ const prompt = ai.definePrompt({
   name: 'personalizedProductRecommendationsPrompt',
   input: {schema: PersonalizedProductRecommendationsInputSchema},
   output: {schema: PersonalizedProductRecommendationsOutputSchema},
-  prompt: `You are an AI-powered product recommendation engine for NexaMart. Your goal is to suggest highly relevant products to the user based on their past activity and profile, considering popular e-commerce trends. Provide 5 recommendations.
+  prompt: `You are an AI-powered product recommendation engine for NexaMart. Your goal is to suggest highly relevant products to the user based on their past activity and profile.
 
 User Profile:
 Full Name: {{{userProfile.fullName}}}
@@ -53,9 +53,13 @@ User Browsing History:
 No recent browsing history available.
 {{/if}}
 
-Based on this information and popular e-commerce trends, suggest 5 highly relevant products. For each product, include a unique ID (a simple string like "P1", "P2"), a name, a concise description, a category (choose from "Electronics", "Fashion", "Home & Living", "Beauty", or suggest a new relevant one), a price (as a number), and an imageUrl (a placeholder URL like "https://placehold.co/150x150?text=Product+ID").
+Based on this information, suggest 5 highly relevant products. 
 
-Ensure the output is a JSON array of product objects, adhering strictly to the provided output schema.
+CRITICAL INSTRUCTIONS:
+1. Provide exactly 5 recommendations.
+2. For each product, provide a unique ID, name, concise description, category, numeric price, and a valid URL for imageUrl.
+3. Use placeholder image URLs in the format: https://placehold.co/400x400?text=Product+Name
+4. Ensure the output is a pure JSON object matching the schema exactly. DO NOT include any markdown formatting, trailing characters, or extra text outside the JSON.
 `,
 });
 
@@ -75,9 +79,15 @@ const personalizedProductRecommendationsFlow = ai.defineFlow(
         return output!;
       } catch (error: any) {
         attempts++;
-        const isTransient = error.message?.includes('503') || error.message?.includes('high demand');
         
-        if (attempts >= maxAttempts || !isTransient) {
+        // Retry on 503 (High Demand) or INVALID_ARGUMENT (Schema Validation Failure)
+        const isRetryable = 
+          error.message?.includes('503') || 
+          error.message?.includes('high demand') ||
+          error.message?.includes('INVALID_ARGUMENT') ||
+          error.message?.includes('Schema validation failed');
+        
+        if (attempts >= maxAttempts || !isRetryable) {
           throw error;
         }
         
