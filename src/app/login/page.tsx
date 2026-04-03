@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -7,12 +6,14 @@ import Image from "next/image";
 import { useAuthContext } from "@/components/auth-provider";
 import { Spinner } from "@/components/ui/spinner";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
+import { useToast } from "@/hooks/use-toast";
 
 export default function LoginPage() {
   const { user, userProfile, loading, signInWithGoogle } = useAuthContext();
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
+  const { toast } = useToast();
 
   useEffect(() => {
     setMounted(true);
@@ -32,9 +33,20 @@ export default function LoginPage() {
     setIsSigningIn(true);
     try {
       await signInWithGoogle();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Sign in error:", error);
       setIsSigningIn(false);
+      
+      let errorMessage = "An unexpected error occurred. Please try again.";
+      if (error.code === 'auth/unauthorized-domain') {
+        errorMessage = "This domain is not authorized in the Firebase Console. Please add it to Authentication > Settings > Authorized domains.";
+      }
+
+      toast({
+        variant: "destructive",
+        title: "Sign-in Failed",
+        description: errorMessage,
+      });
     }
   };
 
@@ -45,8 +57,6 @@ export default function LoginPage() {
       </div>
     );
   }
-
-  const logoImage = PlaceHolderImages.find(img => img.id === 'logo');
 
   return (
     <div className="min-h-screen flex flex-col bg-background relative overflow-hidden">

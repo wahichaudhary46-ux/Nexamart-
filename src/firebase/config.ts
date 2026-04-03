@@ -1,4 +1,3 @@
-
 /**
  * Firebase configuration object using the provided project credentials.
  * These keys are essential for connecting the client-side SDK to Firebase services.
