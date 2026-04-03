@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -57,7 +58,7 @@ export default function LoginPage() {
           <div className="flex justify-center mb-10">
             <div className="relative">
               <Image
-                src="/1000128270.png"
+                src="https://i.ibb.co/rfKvSNKL/1000128270-1.png"
                 alt="NexaMart" 
                 width={220}
                 height={80}
