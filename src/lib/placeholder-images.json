@@ -1,3 +1,40 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "earbuds",
+      "description": "Wireless Earbuds Pro",
+      "imageUrl": "https://picsum.photos/seed/earbuds/400/400",
+      "imageHint": "wireless earbuds"
+    },
+    {
+      "id": "watch",
+      "description": "Smart Watch Series X",
+      "imageUrl": "https://picsum.photos/seed/watch/400/400",
+      "imageHint": "smart watch"
+    },
+    {
+      "id": "backpack",
+      "description": "Premium Backpack",
+      "imageUrl": "https://picsum.photos/seed/backpack/400/400",
+      "imageHint": "travel backpack"
+    },
+    {
+      "id": "lamp",
+      "description": "Minimalist Desk Lamp",
+      "imageUrl": "https://picsum.photos/seed/lamp/400/400",
+      "imageHint": "desk lamp"
+    },
+    {
+      "id": "hero",
+      "description": "E-commerce Hero Background",
+      "imageUrl": "https://picsum.photos/seed/ecommerce/1200/600",
+      "imageHint": "abstract store"
+    },
+    {
+      "id": "logo",
+      "description": "NexaMart Logo Placeholder",
+      "imageUrl": "https://placehold.co/450x135?text=NexaMart",
+      "imageHint": "company logo"
+    }
+  ]
 }

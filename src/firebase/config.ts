@@ -6,8 +6,10 @@
 export const firebaseConfig = {
   apiKey: "AIzaSyBo9AdImafpscXrIcdP22HdN8um4xPaxOQ",
   authDomain: "nexamart-36ac2.firebaseapp.com",
+  databaseURL: "https://nexamart-36ac2-default-rtdb.firebaseio.com",
   projectId: "nexamart-36ac2",
   storageBucket: "nexamart-36ac2.firebasestorage.app",
   messagingSenderId: "769225832167",
   appId: "1:769225832167:web:c49e11d631afb6a6a55442",
+  measurementId: "G-ZFHMK80G24"
 };
