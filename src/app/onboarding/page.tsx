@@ -4,186 +4,125 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthContext } from "@/components/auth-provider";
-import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { ArrowRight, CheckCircle2, ShieldCheck, Zap } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
+import { motion } from "framer-motion";
 
 export default function OnboardingPage() {
-  const { user, userProfile, loading, updateUserProfile } = useAuthContext();
+  const { user, userProfile, loading, signOut, updateUserProfile } = useAuthContext();
   const router = useRouter();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formData, setFormData] = useState({
-    fullName: "",
-    mobileNumber: "",
-    city: "",
-    address: "",
-  });
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (!loading && !user) {
-      router.push("/login");
-    }
-    if (!loading && userProfile?.isProfileComplete) {
-      router.push("/dashboard");
-    }
+    if (!loading && !user) router.push("/login");
+    if (!loading && userProfile?.isProfileComplete) router.push("/dashboard");
+    if (userProfile?.fullName) setFullName(userProfile.fullName);
+    if (userProfile?.mobileNumber) setPhone(userProfile.mobileNumber);
   }, [user, userProfile, loading, router]);
-
-  useEffect(() => {
-    if (user) {
-      setFormData(prev => ({
-        ...prev,
-        fullName: user.displayName || "",
-      }));
-    }
-  }, [user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
+    if (!fullName.trim()) return;
+    setSaving(true);
     try {
+      // Use the centralized updateUserProfile helper which handles isProfileComplete and server timestamps
       await updateUserProfile({
-        ...formData,
+        fullName,
+        mobileNumber: phone || "",
         isProfileComplete: true,
       });
       router.push("/dashboard");
     } catch (error) {
-      console.error("Error saving profile:", error);
-      setIsSubmitting(false);
+      console.error("Error updating profile:", error);
+    } finally {
+      setSaving(false);
     }
   };
 
-  if (loading) {
-    return <div className="min-h-screen flex items-center justify-center bg-background"><Spinner className="h-10 w-10" /></div>;
-  }
+  const handleSignOut = async () => {
+    await signOut();
+    router.push("/login");
+  };
+
+  if (loading || !user) return <LoadingSpinner />;
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-background overflow-hidden">
-      {/* Left Panel - Hero Branding */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-primary items-center justify-center p-12">
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-20 left-20 w-72 h-72 bg-white rounded-full blur-3xl" />
-          <div className="absolute bottom-20 right-20 w-96 h-96 bg-accent rounded-full blur-3xl" />
-        </div>
-        
-        <div className="relative z-10 text-white space-y-12">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center">
-              <span className="text-primary font-bold text-2xl">N</span>
-            </div>
-            <span className="text-2xl font-bold tracking-tight">NexaMart</span>
-          </div>
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-cyan-700 via-blue-800 to-indigo-900 font-body">
+      {/* Decorative circles */}
+      <div className="absolute top-20 left-10 w-64 h-64 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" />
+      <div className="absolute bottom-20 right-10 w-80 h-80 bg-indigo-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse delay-1000" />
 
-          <div className="space-y-6">
-            <h1 className="text-5xl font-bold leading-tight font-headline">
-              Almost there!<br />
-              <span className="text-accent">Just a few details.</span>
-            </h1>
-            <p className="text-white/80 text-xl max-w-md">
-              Complete your profile to unlock personalized recommendations and exclusive deals.
-            </p>
-          </div>
-
-          <div className="space-y-6">
-            {[
-              { icon: CheckCircle2, text: "Personalized AI Recommendations" },
-              { icon: Zap, text: "Lightning-fast Checkout" },
-              { icon: ShieldCheck, text: "Secure Member Data Protection" }
-            ].map((item, i) => (
-              <div key={i} className="flex items-center gap-4 group">
-                <div className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center">
-                  <item.icon className="w-5 h-5 text-accent" />
-                </div>
-                <span className="text-white font-medium">{item.text}</span>
+      <div className="relative flex min-h-screen items-center justify-center px-4 py-12">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+          className="w-full max-w-md"
+        >
+          <div className="rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl p-8 md:p-10">
+            <div className="text-center mb-8">
+              <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-blue-400 to-indigo-500 flex items-center justify-center mx-auto mb-4 shadow-lg">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
               </div>
-            ))}
-          </div>
-        </div>
-      </div>
+              <h2 className="text-2xl font-bold text-white font-headline">Complete your profile</h2>
+              <p className="text-white/70 text-sm mt-1">Tell us a bit about yourself to get started at NexaMart</p>
+            </div>
 
-      {/* Right Panel - Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 md:p-12">
-        <div className="w-full max-w-md space-y-8">
-          <div className="lg:hidden flex justify-center mb-8">
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center shadow-lg">
-                <span className="text-white font-bold text-xl">N</span>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-white/80 mb-1">Full Name *</label>
+                <Input
+                  type="text"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  placeholder="e.g. Akash Sharma"
+                  required
+                  className="bg-white/20 border-white/30 text-white placeholder:text-white/50 rounded-xl focus:ring-accent"
+                />
               </div>
-              <span className="text-xl font-bold text-primary">NexaMart</span>
+              <div>
+                <label className="block text-sm font-medium text-white/80 mb-1">Phone Number (optional)</label>
+                <Input
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="+91 98765 43210"
+                  className="bg-white/20 border-white/30 text-white placeholder:text-white/50 rounded-xl focus:ring-accent"
+                />
+              </div>
+              <Button
+                type="submit"
+                disabled={saving || !fullName.trim()}
+                className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold h-12 rounded-xl shadow-lg transition-all duration-200 active:scale-95"
+              >
+                {saving ? <Spinner className="h-5 w-5 text-white" /> : "Continue to Dashboard →"}
+              </Button>
+            </form>
+
+            <div className="mt-6 text-center">
+              <button
+                onClick={handleSignOut}
+                className="text-sm text-white/60 hover:text-white/90 transition underline-offset-4 hover:underline"
+              >
+                ← Sign out
+              </button>
             </div>
           </div>
-
-          <div className="text-center space-y-2">
-            <h2 className="text-3xl font-bold text-foreground font-headline">Complete Your Profile</h2>
-            <p className="text-muted-foreground">Help us personalize your shopping experience</p>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-6 bg-white/50 backdrop-blur shadow-xl border border-border p-8 rounded-3xl">
-            <div className="space-y-2">
-              <Label htmlFor="fullName">Full Name</Label>
-              <Input
-                id="fullName"
-                required
-                placeholder="John Doe"
-                value={formData.fullName}
-                onChange={e => setFormData({ ...formData, fullName: e.target.value })}
-                className="rounded-xl"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="mobile">Mobile Number</Label>
-              <Input
-                id="mobile"
-                required
-                type="tel"
-                placeholder="10-digit number"
-                value={formData.mobileNumber}
-                onChange={e => setFormData({ ...formData, mobileNumber: e.target.value })}
-                className="rounded-xl"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="city">City</Label>
-              <Input
-                id="city"
-                required
-                placeholder="Enter your city"
-                value={formData.city}
-                onChange={e => setFormData({ ...formData, city: e.target.value })}
-                className="rounded-xl"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="address">Address</Label>
-              <Input
-                id="address"
-                required
-                placeholder="Street, locality, area"
-                value={formData.address}
-                onChange={e => setFormData({ ...formData, address: e.target.value })}
-                className="rounded-xl"
-              />
-            </div>
-
-            <Button type="submit" disabled={isSubmitting} className="w-full h-12 rounded-xl text-lg font-semibold gap-2 shadow-lg hover:shadow-primary/20 transition-all">
-              {isSubmitting ? <Spinner className="h-5 w-5 text-white" /> : (
-                <>
-                  Save & Start Shopping
-                  <ArrowRight className="w-5 h-5" />
-                </>
-              )}
-            </Button>
-          </form>
-
-          <p className="text-center text-xs text-muted-foreground">
-            We value your privacy. Your data is encrypted and never shared.
-          </p>
-        </div>
+        </motion.div>
       </div>
+    </div>
+  );
+}
+
+function LoadingSpinner() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 to-indigo-900">
+      <Spinner className="h-8 w-8 text-white" />
     </div>
   );
 }
