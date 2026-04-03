@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -8,8 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { motion } from "framer-motion";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { useFirestore } from "@/firebase";
+import { errorEmitter } from "@/firebase/error-emitter";
+import { FirestorePermissionError } from "@/firebase/errors";
 
 export default function OnboardingPage() {
   const { user, userProfile, loading, signOut } = useAuth();
@@ -21,28 +22,40 @@ export default function OnboardingPage() {
 
   useEffect(() => {
     if (!loading && !user) router.push("/login");
-    if (!loading && userProfile?.isProfileComplete) router.push("/dashboard");
+    if (!loading && user && userProfile?.isProfileComplete) router.push("/dashboard");
     if (userProfile?.fullName) setFullName(userProfile.fullName);
   }, [user, userProfile, loading, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!fullName.trim()) return;
+    if (!fullName.trim() || !user) return;
     setSaving(true);
-    try {
-      const userRef = doc(db, "users", user!.uid);
-      await updateDoc(userRef, {
-        fullName,
-        mobileNumber: phone || "",
-        isProfileComplete: true,
-        updatedAt: new Date(),
+    
+    const userRef = doc(db, "users", user.uid);
+    const updateData = {
+      fullName,
+      mobileNumber: phone || "",
+      isProfileComplete: true,
+      updatedAt: serverTimestamp(),
+    };
+
+    updateDoc(userRef, updateData)
+      .then(() => {
+        router.push("/dashboard");
+      })
+      .catch(async (error: any) => {
+        if (error.code === 'permission-denied') {
+          const permissionError = new FirestorePermissionError({
+            path: userRef.path,
+            operation: 'update',
+            requestResourceData: updateData,
+          });
+          errorEmitter.emit('permission-error', permissionError);
+        }
+      })
+      .finally(() => {
+        setSaving(false);
       });
-      router.push("/dashboard");
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setSaving(false);
-    }
   };
 
   if (loading || !user) return <LoadingSpinner />;

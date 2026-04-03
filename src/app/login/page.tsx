@@ -1,9 +1,7 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import { useAuth } from "@/components/auth-provider";
 import { Spinner } from "@/components/ui/spinner";
 import { motion } from "framer-motion";
@@ -18,8 +16,11 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (!loading && user) {
-      if (userProfile?.isProfileComplete) router.push("/dashboard");
-      else router.push("/onboarding");
+      if (userProfile?.isProfileComplete) {
+        router.push("/dashboard");
+      } else if (userProfile) {
+        router.push("/onboarding");
+      }
     }
   }, [user, userProfile, loading, router]);
 
@@ -36,42 +37,43 @@ export default function LoginPage() {
   if (loading) return <LoadingSpinner />;
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: mounted ? 1 : 0, y: mounted ? 0 : -20 }}
-          transition={{ duration: 0.5 }}
-          className="flex justify-center"
-        >
-          {/* Clean E-commerce Logo */}
-          <div className="w-16 h-16 rounded-xl bg-blue-600 flex items-center justify-center shadow-md">
-            <span className="text-white font-extrabold text-3xl tracking-wider">N</span>
-          </div>
-        </motion.div>
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Welcome to NexaMart
-        </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
-          Sign in to manage your store
-        </p>
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800">
+      {/* Animated background blobs */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" />
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-pink-400 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse delay-1000" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-indigo-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse delay-2000" />
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+      <div className="relative flex min-h-screen items-center justify-center px-4 py-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: mounted ? 1 : 0, y: mounted ? 0 : 20 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="bg-white py-8 px-4 shadow-xl sm:rounded-2xl sm:px-10 border border-gray-100"
+          transition={{ duration: 0.8, type: "spring" }}
+          className="w-full max-w-md"
         >
-          <div className="mt-2">
+          <div className="relative rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl p-8 md:p-10">
+            {/* Logo */}
+            <div className="flex justify-center mb-8">
+              <div className="w-20 h-20 rounded-2xl bg-gradient-to-tr from-indigo-500 to-pink-500 flex items-center justify-center shadow-lg">
+                <span className="text-white font-bold text-3xl">N</span>
+              </div>
+            </div>
+
+            <h1 className="text-3xl font-bold text-center text-white mb-2">
+              Welcome back
+            </h1>
+            <p className="text-center text-white/70 mb-8">
+              Sign in to continue to NexaMart
+            </p>
+
             <button
               onClick={handleGoogleSignIn}
               disabled={isSigningIn}
-              className="w-full flex justify-center items-center gap-3 py-3 px-4 border border-gray-300 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all disabled:opacity-70"
+              className="group relative w-full flex items-center justify-center gap-3 bg-white/90 hover:bg-white rounded-xl px-4 py-3 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-70"
             >
               {isSigningIn ? (
-                <Spinner className="h-5 w-5 text-blue-600" />
+                <Spinner className="h-5 w-5" />
               ) : (
                 <>
                   <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -92,23 +94,16 @@ export default function LoginPage() {
                       d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                     />
                   </svg>
-                  <span>Continue with Google</span>
+                  <span className="text-gray-800 font-medium">
+                    {isSigningIn ? "Signing in..." : "Continue with Google"}
+                  </span>
                 </>
               )}
             </button>
-          </div>
 
-          <div className="mt-8">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-200" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">
-                  Secure & Fast Login
-                </span>
-              </div>
-            </div>
+            <p className="text-xs text-center text-white/50 mt-8">
+              By continuing, you agree to our Terms and Privacy Policy.
+            </p>
           </div>
         </motion.div>
       </div>
@@ -118,8 +113,8 @@ export default function LoginPage() {
 
 function LoadingSpinner() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <Spinner className="h-8 w-8 text-blue-600" />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-900 to-purple-900">
+      <Spinner className="h-8 w-8 text-white" />
     </div>
   );
 }
