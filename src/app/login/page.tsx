@@ -36,7 +36,7 @@ export default function LoginPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <Spinner className="h-8 w-8" />
+        <Spinner className="h-8 w-8 text-primary" />
       </div>
     );
   }
@@ -53,12 +53,12 @@ export default function LoginPage() {
         className="w-full max-w-md"
       >
         <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-200 p-8 md:p-10">
-          {/* New Professional Logo */}
+          {/* Professional Logo */}
           <div className="flex justify-center mb-10">
             <div className="relative">
               <Image
                 src="/1000128270.png"
-                alt="NexaMart"
+                alt="NexaMart" 
                 width={220}
                 height={80}
                 className="mx-auto object-contain drop-shadow-md"
@@ -69,7 +69,7 @@ export default function LoginPage() {
 
           <div className="text-center space-y-2 mb-8">
             <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
-              Welcome back
+              Welcome to NexaMart
             </h1>
             <p className="text-slate-500 text-sm font-medium leading-relaxed max-w-[280px] mx-auto">
               Discover every product in your local area, instantly.
@@ -145,14 +145,6 @@ export default function LoginPage() {
           © {new Date().getFullYear()} NexaMart Platforms Inc. All rights reserved.
         </p>
       </motion.div>
-    </div>
-  );
-}
-
-function LoadingSpinner() {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50">
-      <Spinner className="h-8 w-8 text-primary" />
     </div>
   );
 }
