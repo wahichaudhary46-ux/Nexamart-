@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { useAuth } from "@/components/auth-provider";
+import { useAuthContext } from "@/components/auth-provider";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import {
@@ -37,7 +37,7 @@ const featuredProducts = [
 ];
 
 export default function DashboardPage() {
-  const { user, userProfile, loading, signOut } = useAuth();
+  const { user, userProfile, loading, signOut } = useAuthContext();
   const router = useRouter();
   const [recommendations, setRecommendations] = useState<any[]>([]);
   const [loadingAI, setLoadingAI] = useState(false);

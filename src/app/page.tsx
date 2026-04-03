@@ -3,11 +3,11 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/components/auth-provider";
+import { useAuthContext } from "@/components/auth-provider";
 import { Spinner } from "@/components/ui/spinner";
 
 export default function HomePage() {
-  const { user, userProfile, loading } = useAuth();
+  const { user, userProfile, loading } = useAuthContext();
   const router = useRouter();
 
   useEffect(() => {

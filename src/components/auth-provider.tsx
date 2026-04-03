@@ -8,9 +8,9 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut as firebaseSignOut } from "firebase/auth";
+import { GoogleAuthProvider, signInWithPopup, signOut as firebaseSignOut } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { auth, db } from "@/lib/firebase";
+import { useAuth, useFirestore, useUser } from "@/firebase";
 
 export interface UserProfile {
   uid: string;
@@ -43,9 +43,11 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<FirebaseUser | null>(null);
+  const auth = useAuth();
+  const db = useFirestore();
+  const { user: firebaseUser, loading: authLoading } = useUser();
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [profileLoading, setProfileLoading] = useState(true);
 
   const fetchUserProfile = async (uid: string): Promise<UserProfile | null> => {
     try {
@@ -62,26 +64,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+    async function initProfile() {
       if (firebaseUser) {
-        const userData: FirebaseUser = {
-          uid: firebaseUser.uid,
-          email: firebaseUser.email,
-          photoURL: firebaseUser.photoURL,
-          displayName: firebaseUser.displayName,
-        };
-        setUser(userData);
         const profile = await fetchUserProfile(firebaseUser.uid);
         setUserProfile(profile);
       } else {
-        setUser(null);
         setUserProfile(null);
       }
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, []);
+      setProfileLoading(false);
+    }
+    if (!authLoading) {
+      initProfile();
+    }
+  }, [firebaseUser, authLoading]);
 
   const signInWithGoogle = async () => {
     try {
@@ -97,7 +92,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await firebaseSignOut(auth);
       setUserProfile(null);
-      setUser(null);
     } catch (error) {
       console.error("Error signing out:", error);
       throw error;
@@ -105,18 +99,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const updateUserProfile = async (data: Partial<UserProfile>) => {
-    if (!user) return;
+    if (!firebaseUser) return;
     try {
-      const docRef = doc(db, "users", user.uid);
+      const docRef = doc(db, "users", firebaseUser.uid);
       const profileData = {
         ...data,
-        uid: user.uid,
-        email: user.email,
-        photoURL: user.photoURL,
+        uid: firebaseUser.uid,
+        email: firebaseUser.email,
+        photoURL: firebaseUser.photoURL,
         updatedAt: new Date(),
       };
       await setDoc(docRef, profileData, { merge: true });
-      const updatedProfile = await fetchUserProfile(user.uid);
+      const updatedProfile = await fetchUserProfile(firebaseUser.uid);
       setUserProfile(updatedProfile);
     } catch (error) {
       console.error("Error updating user profile:", error);
@@ -124,17 +118,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const userContextValue = firebaseUser ? {
+    uid: firebaseUser.uid,
+    email: firebaseUser.email,
+    photoURL: firebaseUser.photoURL,
+    displayName: firebaseUser.displayName,
+  } : null;
+
   return (
-    <AuthContext.Provider value={{ user, userProfile, loading, signInWithGoogle, signOut, updateUserProfile }}>
+    <AuthContext.Provider value={{ 
+      user: userContextValue, 
+      userProfile, 
+      loading: authLoading || profileLoading, 
+      signInWithGoogle, 
+      signOut, 
+      updateUserProfile 
+    }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
-export function useAuth() {
+export function useAuthContext() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error("useAuthContext must be used within an AuthProvider");
   }
   return context;
 }

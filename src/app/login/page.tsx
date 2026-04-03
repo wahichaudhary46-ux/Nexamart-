@@ -4,12 +4,12 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { useAuth } from "@/components/auth-provider";
+import { useAuthContext } from "@/components/auth-provider";
 import { Spinner } from "@/components/ui/spinner";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 export default function LoginPage() {
-  const { user, userProfile, loading, signInWithGoogle } = useAuth();
+  const { user, userProfile, loading, signInWithGoogle } = useAuthContext();
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
@@ -58,14 +58,12 @@ export default function LoginPage() {
 
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 py-12">
         <div className={`mb-12 transition-all duration-1000 ease-out ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-          {logoImage && (
-            <div className="flex flex-col items-center gap-4">
-              <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center shadow-xl">
-                <span className="text-primary-foreground font-bold text-3xl">N</span>
-              </div>
-              <h1 className="text-3xl font-bold text-primary tracking-tight">NexaMart</h1>
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center shadow-xl">
+              <span className="text-primary-foreground font-bold text-3xl">N</span>
             </div>
-          )}
+            <h1 className="text-3xl font-bold text-primary tracking-tight">NexaMart</h1>
+          </div>
         </div>
 
         <div className={`w-full max-w-md transition-all duration-1000 ease-out delay-200 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>

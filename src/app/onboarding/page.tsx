@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/components/auth-provider";
+import { useAuthContext } from "@/components/auth-provider";
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { ArrowRight, CheckCircle2, ShieldCheck, Zap } from "lucide-react";
 
 export default function OnboardingPage() {
-  const { user, userProfile, loading, updateUserProfile } = useAuth();
+  const { user, userProfile, loading, updateUserProfile } = useAuthContext();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
