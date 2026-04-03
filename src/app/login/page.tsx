@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import { useAuthContext } from "@/components/auth-provider";
 import { Spinner } from "@/components/ui/spinner";
 import { useToast } from "@/hooks/use-toast";
@@ -38,9 +37,10 @@ export default function LoginPage() {
       
       let errorMessage = "An unexpected error occurred. Please try again.";
       
-      // Handle the unauthorized domain error specifically
+      // Specifically handle the unauthorized domain error which is common during setup
       if (error.code === 'auth/unauthorized-domain' || error.message?.includes('unauthorized-domain')) {
-        errorMessage = "This domain is not authorized. Please add " + window.location.hostname + " to the Authorized Domains list in your Firebase Console (Authentication > Settings).";
+        const currentHostname = typeof window !== 'undefined' ? window.location.hostname : 'your domain';
+        errorMessage = `Domain Not Authorized: Please add "${currentHostname}" to the "Authorized Domains" list in your Firebase Console (Authentication > Settings).`;
       }
 
       toast({
@@ -61,7 +61,6 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background relative overflow-hidden">
-      {/* Background Orbs */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute -top-32 -right-32 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse" />
         <div className="absolute -bottom-32 -left-32 w-[500px] h-[500px] bg-accent/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
