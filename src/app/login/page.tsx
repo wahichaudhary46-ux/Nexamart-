@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -6,7 +7,7 @@ import Image from "next/image";
 import { useAuth } from "@/components/auth-provider";
 import { Spinner } from "@/components/ui/spinner";
 import { motion } from "framer-motion";
-import { MapPin, ShoppingBag, Search } from "lucide-react";
+import { ShieldCheck, MapPin, Search, ShoppingBag } from "lucide-react";
 
 export default function LoginPage() {
   const { user, userProfile, loading, signInWithGoogle } = useAuth();
@@ -36,7 +37,7 @@ export default function LoginPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <Spinner className="h-8 w-8 text-blue-600" />
+        <Spinner className="h-8 w-8" />
       </div>
     );
   }
@@ -44,62 +45,47 @@ export default function LoginPage() {
   return (
     <div className="relative min-h-screen w-full flex items-center justify-center bg-slate-50 px-4 py-12">
       {/* Professional subtle background pattern */}
-      <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:20px_20px]" />
-
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]" />
+      
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: mounted ? 1 : 0, y: mounted ? 0 : 20 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-[450px]"
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: mounted ? 1 : 0, y: mounted ? 0 : 15 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="w-full max-w-md"
       >
-        <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 p-8 md:p-10">
-          {/* Professional Logo */}
-          <div className="flex justify-center mb-8">
-            <div className="relative w-[220px] h-[80px]">
+        <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-200 p-8 md:p-10">
+          {/* Professional Logo Integration */}
+          <div className="flex justify-center mb-10">
+            <div className="relative">
               <Image
                 src="https://kommodo.ai/i/JOcih1ioLO78eqWEtcdO"
                 alt="NexaMart"
-                fill
-                className="object-contain"
-                unoptimized
+                width={220}
+                height={80}
+                className="mx-auto object-contain"
                 priority
+                unoptimized
               />
             </div>
           </div>
 
-          <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-slate-900 mb-2">
+          <div className="text-center space-y-2 mb-8">
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
               Welcome back
             </h1>
-            <p className="text-slate-500 text-sm">
+            <p className="text-slate-500 text-sm font-medium leading-relaxed max-w-[280px] mx-auto">
               Discover every product in your local area, instantly.
             </p>
-          </div>
-
-          {/* Business Feature Badges */}
-          <div className="grid grid-cols-3 gap-2 mb-8">
-            <div className="flex flex-col items-center p-2 rounded-lg bg-slate-50 border border-slate-100">
-              <MapPin className="w-4 h-4 text-blue-600 mb-1" />
-              <span className="text-[10px] font-semibold text-slate-600 text-center leading-tight">Local Availability</span>
-            </div>
-            <div className="flex flex-col items-center p-2 rounded-lg bg-slate-50 border border-slate-100">
-              <ShoppingBag className="w-4 h-4 text-purple-600 mb-1" />
-              <span className="text-[10px] font-semibold text-slate-600 text-center leading-tight">A to Z Products</span>
-            </div>
-            <div className="flex flex-col items-center p-2 rounded-lg bg-slate-50 border border-slate-100">
-              <Search className="w-4 h-4 text-pink-600 mb-1" />
-              <span className="text-[10px] font-semibold text-slate-600 text-center leading-tight">Easy Discovery</span>
-            </div>
           </div>
 
           {/* Google Sign In Button */}
           <button
             onClick={handleGoogleSignIn}
             disabled={isSigningIn}
-            className="w-full flex items-center justify-center gap-3 bg-white border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold rounded-xl px-4 py-3.5 transition-all duration-200 shadow-sm disabled:opacity-70"
+            className="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-50 text-slate-700 font-semibold border border-slate-300 rounded-xl px-4 py-3.5 transition-all duration-200 active:scale-[0.98] disabled:opacity-70 shadow-sm"
           >
             {isSigningIn ? (
-              <Spinner className="h-5 w-5 text-blue-600" />
+              <Spinner className="h-5 w-5" />
             ) : (
               <>
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -125,25 +111,50 @@ export default function LoginPage() {
             )}
           </button>
 
-          {/* Secure & Professional Policies */}
-          <div className="mt-10 pt-6 border-t border-slate-100">
-            <div className="flex flex-col items-center gap-2">
-              <div className="flex items-center gap-1.5 text-slate-400 mb-1">
-                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-                <span className="text-[10px] uppercase tracking-widest font-bold">Secure Business Access</span>
+          {/* Business Feature Badges */}
+          <div className="mt-10 pt-8 border-t border-slate-100">
+            <div className="flex flex-wrap justify-center gap-y-4 gap-x-6">
+              <div className="flex items-center gap-2 text-slate-600">
+                <MapPin className="w-4 h-4 text-primary" />
+                <span className="text-[13px] font-semibold">Local Availability</span>
               </div>
-              <p className="text-[11px] text-slate-500 text-center leading-relaxed">
-                By logging in, you agree to our{" "}
-                <button className="text-blue-600 font-semibold hover:underline">Terms of Service</button>
-                {" "}and{" "}
-                <button className="text-blue-600 font-semibold hover:underline">Privacy Policy</button>.
-              </p>
+              <div className="flex items-center gap-2 text-slate-600">
+                <ShoppingBag className="w-4 h-4 text-primary" />
+                <span className="text-[13px] font-semibold">A to Z Products</span>
+              </div>
+              <div className="flex items-center gap-2 text-slate-600">
+                <Search className="w-4 h-4 text-primary" />
+                <span className="text-[13px] font-semibold">Easy Discovery</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Policy Section */}
+          <div className="mt-10 text-center space-y-3">
+            <div className="flex items-center justify-center gap-2 text-slate-400 mb-2">
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span className="text-[11px] uppercase tracking-widest font-bold">Secure Access</span>
+            </div>
+            <div className="flex justify-center gap-4 text-[12px] font-semibold">
+              <a href="#" className="text-slate-500 hover:text-primary transition-colors">Terms of Service</a>
+              <span className="text-slate-300">•</span>
+              <a href="#" className="text-slate-500 hover:text-primary transition-colors">Privacy Policy</a>
             </div>
           </div>
         </div>
+        
+        <p className="mt-8 text-center text-slate-400 text-xs font-medium">
+          © {new Date().getFullYear()} NexaMart Platforms Inc. All rights reserved.
+        </p>
       </motion.div>
+    </div>
+  );
+}
+
+function LoadingSpinner() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <Spinner className="h-8 w-8 text-primary" />
     </div>
   );
 }

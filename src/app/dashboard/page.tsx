@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -66,7 +67,6 @@ export default function DashboardPage() {
           setRecommendations(res.recommendations || []);
         } catch (error: any) {
           setAiError(true);
-          // Only show toast for non-503 errors or after retries fail
           if (!error.message?.includes('503')) {
             console.error("AI Recommendation error:", error);
           }
@@ -96,11 +96,15 @@ export default function DashboardPage() {
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-border bg-white/80 backdrop-blur-md">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-md">
-              <span className="text-white font-bold text-lg">N</span>
-            </div>
-            <span className="text-primary text-xl font-bold tracking-tight hidden sm:block">NexaMart</span>
+          <div className="flex items-center">
+            <Image
+              src="https://kommodo.ai/i/JOcih1ioLO78eqWEtcdO"
+              alt="NexaMart"
+              width={140}
+              height={40}
+              className="object-contain"
+              unoptimized
+            />
           </div>
 
           {/* Global Search */}
@@ -165,7 +169,7 @@ export default function DashboardPage() {
                   Welcome back, {userProfile.fullName?.split(" ")[0]}!
                 </h1>
                 <p className="text-white/80 text-lg max-w-md">
-                  Discover curated picks and amazing seasonal deals picked just for you in {userProfile.city}.
+                  Discover curated picks and amazing seasonal deals picked just for you in {userProfile.city || "your area"}.
                 </p>
                 <div className="flex flex-wrap gap-4 justify-center md:justify-start pt-4">
                   <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-2xl h-14 px-8 font-bold text-lg shadow-xl shadow-accent/20 transition-all hover:scale-105 active:scale-95">
@@ -181,7 +185,7 @@ export default function DashboardPage() {
                 <div className="relative w-full h-full bg-white/10 backdrop-blur-md rounded-[3rem] border border-white/20 p-6 flex flex-col items-center justify-center text-white text-center gap-2">
                   <Sparkles className="w-12 h-12 text-accent" />
                   <span className="font-bold text-xl">Member Perk</span>
-                  <span className="text-sm text-white/70">Free delivery on all orders today!</span>
+                  <span className="text-sm text-white/70">Exclusive access to local launches!</span>
                 </div>
               </div>
             </div>
