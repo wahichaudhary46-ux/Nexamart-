@@ -66,7 +66,25 @@ const personalizedProductRecommendationsFlow = ai.defineFlow(
     outputSchema: PersonalizedProductRecommendationsOutputSchema,
   },
   async (input) => {
-    const {output} = await prompt(input);
-    return output!;
+    let attempts = 0;
+    const maxAttempts = 3;
+    
+    while (attempts < maxAttempts) {
+      try {
+        const {output} = await prompt(input);
+        return output!;
+      } catch (error: any) {
+        attempts++;
+        const isTransient = error.message?.includes('503') || error.message?.includes('high demand');
+        
+        if (attempts >= maxAttempts || !isTransient) {
+          throw error;
+        }
+        
+        // Exponential backoff: 1s, 2s, 4s...
+        await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempts) * 500));
+      }
+    }
+    throw new Error('Failed to generate recommendations after multiple attempts.');
   }
 );

@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -17,10 +16,11 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { 
   Search, ShoppingCart, Laptop, Shirt, Home, Heart, Star, 
-  Sparkles, ChevronRight, Menu, LogOut, Package, User 
+  Sparkles, ChevronRight, Menu, LogOut, Package, User, AlertCircle
 } from "lucide-react";
 import { personalizedProductRecommendations } from "@/ai/flows/personalized-product-recommendations-flow";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
+import { useToast } from "@/hooks/use-toast";
 
 const categories = [
   { name: "Electronics", icon: Laptop, count: 1240 },
@@ -39,8 +39,10 @@ const featuredProducts = [
 export default function DashboardPage() {
   const { user, userProfile, loading, signOut } = useAuthContext();
   const router = useRouter();
+  const { toast } = useToast();
   const [recommendations, setRecommendations] = useState<any[]>([]);
   const [loadingAI, setLoadingAI] = useState(false);
+  const [aiError, setAiError] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -55,14 +57,19 @@ export default function DashboardPage() {
     async function getRecommendations() {
       if (userProfile?.fullName) {
         setLoadingAI(true);
+        setAiError(false);
         try {
           const res = await personalizedProductRecommendations({
             browsingHistory: ["Premium electronics", "Home decor"],
             userProfile: { fullName: userProfile.fullName, city: userProfile.city }
           });
-          setRecommendations(res.recommendations);
-        } catch (error) {
-          console.error("AI Recommendation error:", error);
+          setRecommendations(res.recommendations || []);
+        } catch (error: any) {
+          setAiError(true);
+          // Only show toast for non-503 errors or after retries fail
+          if (!error.message?.includes('503')) {
+            console.error("AI Recommendation error:", error);
+          }
         } finally {
           setLoadingAI(false);
         }
@@ -221,6 +228,17 @@ export default function DashboardPage() {
           
           {loadingAI ? (
             <div className="flex justify-center py-12"><Spinner className="h-10 w-10" /></div>
+          ) : aiError ? (
+            <div className="flex flex-col items-center justify-center py-12 text-center space-y-4">
+              <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
+                <AlertCircle className="w-8 h-8 text-muted-foreground" />
+              </div>
+              <div className="space-y-1">
+                <p className="font-bold text-foreground">Recommendations Temporarily Unavailable</p>
+                <p className="text-sm text-muted-foreground max-w-xs mx-auto">We're experiencing high demand. Please refresh the page or check back in a few moments.</p>
+              </div>
+              <Button variant="outline" onClick={() => window.location.reload()} className="rounded-xl">Try Again</Button>
+            </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
               {recommendations.map((item) => (
