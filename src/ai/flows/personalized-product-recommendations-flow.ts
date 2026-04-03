@@ -58,7 +58,7 @@ Based on this information, suggest 5 highly relevant products.
 CRITICAL INSTRUCTIONS:
 1. Provide exactly 5 recommendations.
 2. For each product, provide a unique ID, name, concise description, category, numeric price, and a valid URL for imageUrl.
-3. Use placeholder image URLs in the format: https://placehold.co/400x400?text=Product+Name
+3. Use placeholder image URLs in the format: https://picsum.photos/seed/{{id}}/400/400
 4. Ensure the output is a pure JSON object matching the schema exactly. DO NOT include any markdown formatting, trailing characters, or extra text outside the JSON.
 `,
 });
@@ -80,10 +80,14 @@ const personalizedProductRecommendationsFlow = ai.defineFlow(
       } catch (error: any) {
         attempts++;
         
-        // Retry on 503 (High Demand) or INVALID_ARGUMENT (Schema Validation Failure)
+        // Retry on 503 (High Demand), 429 (Quota Exceeded), or INVALID_ARGUMENT (Schema Validation Failure)
         const isRetryable = 
           error.message?.includes('503') || 
+          error.message?.includes('500') ||
           error.message?.includes('high demand') ||
+          error.message?.includes('429') ||
+          error.message?.includes('RESOURCE_EXHAUSTED') ||
+          error.message?.includes('quota') ||
           error.message?.includes('INVALID_ARGUMENT') ||
           error.message?.includes('Schema validation failed');
         
@@ -91,8 +95,8 @@ const personalizedProductRecommendationsFlow = ai.defineFlow(
           throw error;
         }
         
-        // Exponential backoff: 1s, 2s, 4s...
-        await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempts) * 500));
+        // Exponential backoff: 2s, 4s, 8s...
+        await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempts) * 1000));
       }
     }
     throw new Error('Failed to generate recommendations after multiple attempts.');
