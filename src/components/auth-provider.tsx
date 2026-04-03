@@ -64,28 +64,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchUserProfile = async (uid: string): Promise<UserProfile | null> => {
+  // Helper to fetch profile with error handling
+  const fetchUserProfile = async (uid: string) => {
     const docRef = doc(db, "users", uid);
     try {
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         return docSnap.data() as UserProfile;
       }
-      return null;
     } catch (error: any) {
       if (error.code === 'permission-denied') {
-        const permissionError = new FirestorePermissionError({
+        errorEmitter.emit('permission-error', new FirestorePermissionError({
           path: docRef.path,
           operation: 'get',
-        });
-        errorEmitter.emit('permission-error', permissionError);
+        }));
       }
-      return null;
     }
+    return null;
   };
 
-  const createInitialProfile = async (user: User) => {
-    const docRef = doc(db, "users", user.uid);
+  // Helper to initialize a profile
+  const createInitialProfile = async (user: User): Promise<UserProfile> => {
     const initialProfile: UserProfile = {
       uid: user.uid,
       email: user.email || "",
@@ -99,41 +98,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       updatedAt: serverTimestamp(),
     };
 
+    const docRef = doc(db, "users", user.uid);
     setDoc(docRef, initialProfile, { merge: true }).catch(async (error: any) => {
       if (error.code === 'permission-denied') {
-        const permissionError = new FirestorePermissionError({
+        errorEmitter.emit('permission-error', new FirestorePermissionError({
           path: docRef.path,
           operation: 'create',
           requestResourceData: initialProfile,
-        });
-        errorEmitter.emit('permission-error', permissionError);
+        }));
       }
     });
-    
+
     return initialProfile;
   };
 
   useEffect(() => {
-    const checkRedirect = async () => {
-      try {
-        const result = await getRedirectResult(auth);
-        if (result?.user) {
-          const profile = await fetchUserProfile(result.user.uid);
-          if (!profile) {
-            await createInitialProfile(result.user);
-          }
-        }
-      } catch (error: any) {
-        console.error("Auth redirect error:", error);
-      }
-    };
-    checkRedirect();
-  }, [auth]);
-
-  useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setFirebaseUser(user);
+      
       if (user) {
+        // Handle redirect result if any
+        try {
+          await getRedirectResult(auth);
+        } catch (e) {
+          console.error("Redirect error:", e);
+        }
+
+        // Fetch or create profile
         let profile = await fetchUserProfile(user.uid);
         if (!profile) {
           profile = await createInitialProfile(user);
@@ -142,8 +133,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } else {
         setUserProfile(null);
       }
+      
       setLoading(false);
     });
+
     return () => unsubscribe();
   }, [auth, db]);
 
@@ -153,7 +146,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signUp = async (email: string, pass: string) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
-    await createInitialProfile(userCredential.user);
+    const profile = await createInitialProfile(userCredential.user);
+    setUserProfile(profile);
   };
 
   const signInWithGoogle = async () => {
@@ -191,12 +185,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setDoc(docRef, profileData, { merge: true })
       .catch(async (error: any) => {
         if (error.code === 'permission-denied') {
-          const permissionError = new FirestorePermissionError({
+          errorEmitter.emit('permission-error', new FirestorePermissionError({
             path: docRef.path,
             operation: 'write',
             requestResourceData: profileData,
-          });
-          errorEmitter.emit('permission-error', permissionError);
+          }));
         }
       });
 
