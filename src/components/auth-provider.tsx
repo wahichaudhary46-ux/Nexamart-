@@ -1,4 +1,3 @@
-
 "use client";
 
 import {
@@ -11,6 +10,8 @@ import {
 import { GoogleAuthProvider, signInWithPopup, signOut as firebaseSignOut } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { useAuth, useFirestore, useUser } from "@/firebase";
+import { errorEmitter } from "@/firebase/error-emitter";
+import { FirestorePermissionError } from "@/firebase/errors";
 
 export interface UserProfile {
   uid: string;
@@ -50,14 +51,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profileLoading, setProfileLoading] = useState(true);
 
   const fetchUserProfile = async (uid: string): Promise<UserProfile | null> => {
+    const docRef = doc(db, "users", uid);
     try {
-      const docRef = doc(db, "users", uid);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         return docSnap.data() as UserProfile;
       }
       return null;
-    } catch (error) {
+    } catch (error: any) {
+      if (error.code === 'permission-denied') {
+        const permissionError = new FirestorePermissionError({
+          path: docRef.path,
+          operation: 'get',
+        });
+        errorEmitter.emit('permission-error', permissionError);
+      }
       console.error("Error fetching user profile:", error);
       return null;
     }
@@ -100,22 +108,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const updateUserProfile = async (data: Partial<UserProfile>) => {
     if (!firebaseUser) return;
-    try {
-      const docRef = doc(db, "users", firebaseUser.uid);
-      const profileData = {
-        ...data,
-        uid: firebaseUser.uid,
-        email: firebaseUser.email,
-        photoURL: firebaseUser.photoURL,
-        updatedAt: new Date(),
-      };
-      await setDoc(docRef, profileData, { merge: true });
-      const updatedProfile = await fetchUserProfile(firebaseUser.uid);
-      setUserProfile(updatedProfile);
-    } catch (error) {
-      console.error("Error updating user profile:", error);
-      throw error;
-    }
+    const docRef = doc(db, "users", firebaseUser.uid);
+    const profileData = {
+      ...data,
+      uid: firebaseUser.uid,
+      email: firebaseUser.email,
+      photoURL: firebaseUser.photoURL,
+      updatedAt: new Date(),
+    };
+
+    setDoc(docRef, profileData, { merge: true })
+      .then(async () => {
+        const updatedProfile = await fetchUserProfile(firebaseUser.uid);
+        setUserProfile(updatedProfile);
+      })
+      .catch(async (error) => {
+        if (error.code === 'permission-denied') {
+          const permissionError = new FirestorePermissionError({
+            path: docRef.path,
+            operation: 'write',
+            requestResourceData: profileData,
+          });
+          errorEmitter.emit('permission-error', permissionError);
+        }
+        console.error("Error updating user profile:", error);
+        throw error;
+      });
   };
 
   const userContextValue = firebaseUser ? {

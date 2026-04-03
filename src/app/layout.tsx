@@ -1,9 +1,9 @@
-
 import type { Metadata } from 'next';
 import './globals.css';
 import { FirebaseClientProvider } from '@/firebase';
 import { AuthProvider } from '@/components/auth-provider';
 import { Toaster } from '@/components/ui/toaster';
+import { FirebaseErrorListener } from '@/components/firebase-error-listener';
 
 export const metadata: Metadata = {
   title: 'NexaMart - Shop Smarter, Live Better',
@@ -25,6 +25,7 @@ export default function RootLayout({
       <body className="font-body antialiased selection:bg-accent/30">
         <FirebaseClientProvider>
           <AuthProvider>
+            <FirebaseErrorListener />
             {children}
             <Toaster />
           </AuthProvider>
