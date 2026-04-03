@@ -13,7 +13,11 @@ import {
   createUserWithEmailAndPassword,
   signOut as firebaseSignOut,
   onAuthStateChanged,
-  User
+  User,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult
 } from "firebase/auth";
 import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { useAuth, useFirestore } from "@/firebase";
@@ -46,6 +50,7 @@ interface AuthContextType {
   loading: boolean;
   signIn: (email: string, pass: string) => Promise<void>;
   signUp: (email: string, pass: string) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
   updateUserProfile: (data: Partial<UserProfile>) => Promise<void>;
 }
@@ -79,11 +84,60 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const createInitialProfile = async (user: User) => {
+    const docRef = doc(db, "users", user.uid);
+    const initialProfile: UserProfile = {
+      uid: user.uid,
+      email: user.email || "",
+      fullName: user.displayName || "",
+      mobileNumber: "",
+      city: "",
+      address: "",
+      photoURL: user.photoURL || null,
+      isProfileComplete: false,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    };
+
+    setDoc(docRef, initialProfile, { merge: true }).catch(async (error: any) => {
+      if (error.code === 'permission-denied') {
+        const permissionError = new FirestorePermissionError({
+          path: docRef.path,
+          operation: 'create',
+          requestResourceData: initialProfile,
+        });
+        errorEmitter.emit('permission-error', permissionError);
+      }
+    });
+    
+    return initialProfile;
+  };
+
+  useEffect(() => {
+    const checkRedirect = async () => {
+      try {
+        const result = await getRedirectResult(auth);
+        if (result?.user) {
+          const profile = await fetchUserProfile(result.user.uid);
+          if (!profile) {
+            await createInitialProfile(result.user);
+          }
+        }
+      } catch (error: any) {
+        console.error("Auth redirect error:", error);
+      }
+    };
+    checkRedirect();
+  }, [auth]);
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setFirebaseUser(user);
       if (user) {
-        const profile = await fetchUserProfile(user.uid);
+        let profile = await fetchUserProfile(user.uid);
+        if (!profile) {
+          profile = await createInitialProfile(user);
+        }
         setUserProfile(profile);
       } else {
         setUserProfile(null);
@@ -99,35 +153,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signUp = async (email: string, pass: string) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
-    const uid = userCredential.user.uid;
-    const docRef = doc(db, "users", uid);
-    
-    const initialProfile: UserProfile = {
-      uid,
-      email,
-      fullName: "",
-      mobileNumber: "",
-      city: "",
-      address: "",
-      photoURL: null,
-      isProfileComplete: false,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-    };
+    await createInitialProfile(userCredential.user);
+  };
 
-    // Follow mutation pattern: no await, chain catch with permission error emitter
-    setDoc(docRef, initialProfile).catch(async (error: any) => {
-      if (error.code === 'permission-denied') {
-        const permissionError = new FirestorePermissionError({
-          path: docRef.path,
-          operation: 'create',
-          requestResourceData: initialProfile,
-        });
-        errorEmitter.emit('permission-error', permissionError);
+  const signInWithGoogle = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+    } catch (error: any) {
+      if (
+        error.code === 'auth/popup-closed-by-user' || 
+        error.code === 'auth/popup-blocked' || 
+        error.code === 'auth/cancelled-popup-request'
+      ) {
+        await signInWithRedirect(auth, provider);
+      } else {
+        throw error;
       }
-    });
-    
-    setUserProfile(initialProfile);
+    }
   };
 
   const signOut = async () => {
@@ -145,7 +188,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       updatedAt: serverTimestamp(),
     };
 
-    // Follow mutation pattern: no await, chain catch with permission error emitter
     setDoc(docRef, profileData, { merge: true })
       .catch(async (error: any) => {
         if (error.code === 'permission-denied') {
@@ -158,7 +200,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       });
 
-    // Optimistically update local state
     setUserProfile((prev) => prev ? { ...prev, ...data } : null);
   };
 
@@ -176,6 +217,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       loading, 
       signIn, 
       signUp,
+      signInWithGoogle,
       signOut, 
       updateUserProfile 
     }}>

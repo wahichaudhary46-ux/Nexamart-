@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Mail, Lock, LogIn, UserPlus } from "lucide-react";
 
 export default function LoginPage() {
-  const { user, userProfile, loading, signIn, signUp } = useAuthContext();
+  const { user, userProfile, loading, signIn, signUp, signInWithGoogle } = useAuthContext();
   const [isAuthLoading, setIsAuthLoading] = useState(false);
   const [isSignUpMode, setIsSignUpMode] = useState(false);
   const [email, setEmail] = useState("");
@@ -62,14 +62,6 @@ export default function LoginPage() {
         });
       }
     } catch (error: any) {
-      // Don't log known user errors to console.error to avoid NextJS overlay
-      if (error.code !== 'auth/email-already-in-use' && 
-          error.code !== 'auth/invalid-credential' && 
-          error.code !== 'auth/user-not-found' && 
-          error.code !== 'auth/wrong-password') {
-        console.error("Auth error:", error);
-      }
-      
       let errorMessage = "An unexpected error occurred. Please try again.";
       
       if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
@@ -85,6 +77,29 @@ export default function LoginPage() {
         title: isSignUpMode ? "Sign-up Failed" : "Sign-in Failed",
         description: errorMessage,
       });
+    } finally {
+      setIsAuthLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setIsAuthLoading(true);
+    try {
+      await signInWithGoogle();
+    } catch (error: any) {
+      if (error.code === 'auth/unauthorized-domain') {
+        toast({
+          variant: "destructive",
+          title: "Domain Not Authorized",
+          description: "This domain is not authorized in the Firebase Console. Please add it to your Authorized Domains.",
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Login Failed",
+          description: error.message || "Could not sign in with Google.",
+        });
+      }
     } finally {
       setIsAuthLoading(false);
     }
@@ -181,6 +196,28 @@ export default function LoginPage() {
                 )}
               </Button>
             </form>
+
+            <div className="my-8 flex items-center gap-4">
+              <div className="h-px flex-1 bg-border" />
+              <span className="text-xs text-muted-foreground font-bold tracking-widest uppercase">OR</span>
+              <div className="h-px flex-1 bg-border" />
+            </div>
+
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleGoogleSignIn}
+              disabled={isAuthLoading}
+              className="w-full h-12 rounded-xl border-border bg-white hover:bg-muted/30 gap-3 font-semibold transition-all shadow-sm"
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24">
+                <path
+                  fill="#EA4335"
+                  d="M12.48 10.92v3.28h7.84c-.24 1.84-.9 3.16-1.92 4.16-1.24 1.24-3.16 2.52-6.4 2.52-5.12 0-9.28-4.12-9.28-9.24s4.16-9.24 9.28-9.24c2.8 0 4.92 1.08 6.44 2.52l2.32-2.32C18.44 1.44 15.64 0 12.48 0 5.6 0 0 5.6 0 12.48s5.6 12.48 12.48 12.48c3.68 0 6.48-1.2 8.64-3.48 2.24-2.24 2.96-5.4 2.96-7.88 0-.76-.08-1.48-.2-2.16h-11.4z"
+                />
+              </svg>
+              Continue with Google
+            </Button>
 
             <div className="mt-8 pt-6 border-t border-border flex flex-col items-center gap-4">
               <p className="text-sm text-muted-foreground">
