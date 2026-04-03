@@ -3,14 +3,17 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuthContext } from "@/components/auth-provider";
+import { useAuth } from "@/components/auth-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { motion } from "framer-motion";
+import { doc, updateDoc } from "firebase/firestore";
+import { useFirestore } from "@/firebase";
 
 export default function OnboardingPage() {
-  const { user, userProfile, loading, signOut, updateUserProfile } = useAuthContext();
+  const { user, userProfile, loading, signOut } = useAuth();
+  const db = useFirestore();
   const router = useRouter();
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
@@ -20,7 +23,6 @@ export default function OnboardingPage() {
     if (!loading && !user) router.push("/login");
     if (!loading && userProfile?.isProfileComplete) router.push("/dashboard");
     if (userProfile?.fullName) setFullName(userProfile.fullName);
-    if (userProfile?.mobileNumber) setPhone(userProfile.mobileNumber);
   }, [user, userProfile, loading, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -28,29 +30,25 @@ export default function OnboardingPage() {
     if (!fullName.trim()) return;
     setSaving(true);
     try {
-      // Use the centralized updateUserProfile helper which handles isProfileComplete and server timestamps
-      await updateUserProfile({
+      const userRef = doc(db, "users", user!.uid);
+      await updateDoc(userRef, {
         fullName,
         mobileNumber: phone || "",
         isProfileComplete: true,
+        updatedAt: new Date(),
       });
       router.push("/dashboard");
     } catch (error) {
-      console.error("Error updating profile:", error);
+      console.error(error);
     } finally {
       setSaving(false);
     }
   };
 
-  const handleSignOut = async () => {
-    await signOut();
-    router.push("/login");
-  };
-
   if (loading || !user) return <LoadingSpinner />;
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-cyan-700 via-blue-800 to-indigo-900 font-body">
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-cyan-700 via-blue-800 to-indigo-900">
       {/* Decorative circles */}
       <div className="absolute top-20 left-10 w-64 h-64 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" />
       <div className="absolute bottom-20 right-10 w-80 h-80 bg-indigo-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse delay-1000" />
@@ -69,8 +67,8 @@ export default function OnboardingPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
               </div>
-              <h2 className="text-2xl font-bold text-white font-headline">Complete your profile</h2>
-              <p className="text-white/70 text-sm mt-1">Tell us a bit about yourself to get started at NexaMart</p>
+              <h2 className="text-2xl font-bold text-white">Complete your profile</h2>
+              <p className="text-white/70 text-sm mt-1">Tell us a bit about yourself</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -82,7 +80,7 @@ export default function OnboardingPage() {
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="e.g. Akash Sharma"
                   required
-                  className="bg-white/20 border-white/30 text-white placeholder:text-white/50 rounded-xl focus:ring-accent"
+                  className="bg-white/20 border-white/30 text-white placeholder:text-white/50 rounded-xl"
                 />
               </div>
               <div>
@@ -92,22 +90,22 @@ export default function OnboardingPage() {
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="+91 98765 43210"
-                  className="bg-white/20 border-white/30 text-white placeholder:text-white/50 rounded-xl focus:ring-accent"
+                  className="bg-white/20 border-white/30 text-white placeholder:text-white/50 rounded-xl"
                 />
               </div>
               <Button
                 type="submit"
                 disabled={saving || !fullName.trim()}
-                className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold h-12 rounded-xl shadow-lg transition-all duration-200 active:scale-95"
+                className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold h-12 rounded-xl shadow-lg transition-all duration-200"
               >
-                {saving ? <Spinner className="h-5 w-5 text-white" /> : "Continue to Dashboard →"}
+                {saving ? <Spinner className="h-5 w-5" /> : "Continue to Dashboard →"}
               </Button>
             </form>
 
             <div className="mt-6 text-center">
               <button
-                onClick={handleSignOut}
-                className="text-sm text-white/60 hover:text-white/90 transition underline-offset-4 hover:underline"
+                onClick={signOut}
+                className="text-sm text-white/60 hover:text-white/90 transition"
               >
                 ← Sign out
               </button>

@@ -20,7 +20,7 @@ import {
   getRedirectResult
 } from "firebase/auth";
 import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
-import { useAuth, useFirestore } from "@/firebase";
+import { useAuth as useFirebaseAuth, useFirestore } from "@/firebase";
 import { errorEmitter } from "@/firebase/error-emitter";
 import { FirestorePermissionError } from "@/firebase/errors";
 
@@ -58,7 +58,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const auth = useAuth();
+  const auth = useFirebaseAuth();
   const db = useFirestore();
   const [firebaseUser, setFirebaseUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
@@ -113,18 +113,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
+    const checkRedirect = async () => {
+      try {
+        await getRedirectResult(auth);
+      } catch (e) {
+        console.error("Redirect check failed:", e);
+      }
+    };
+    checkRedirect();
+
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setFirebaseUser(user);
       
       if (user) {
-        // Handle redirect result if any
-        try {
-          await getRedirectResult(auth);
-        } catch (e) {
-          console.error("Redirect error:", e);
-        }
-
-        // Fetch or create profile
         let profile = await fetchUserProfile(user.uid);
         if (!profile) {
           profile = await createInitialProfile(user);
@@ -226,3 +227,6 @@ export function useAuthContext() {
   }
   return context;
 }
+
+// Alias for convenience as requested in user snippets
+export const useAuth = useAuthContext;
