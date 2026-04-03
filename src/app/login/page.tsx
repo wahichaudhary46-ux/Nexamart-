@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useAuthContext } from "@/components/auth-provider";
 import { Spinner } from "@/components/ui/spinner";
-import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { useToast } from "@/hooks/use-toast";
 
 export default function LoginPage() {
@@ -38,8 +37,10 @@ export default function LoginPage() {
       setIsSigningIn(false);
       
       let errorMessage = "An unexpected error occurred. Please try again.";
-      if (error.code === 'auth/unauthorized-domain') {
-        errorMessage = "This domain is not authorized in the Firebase Console. Please add it to Authentication > Settings > Authorized domains.";
+      
+      // Handle the unauthorized domain error specifically
+      if (error.code === 'auth/unauthorized-domain' || error.message?.includes('unauthorized-domain')) {
+        errorMessage = "This domain is not authorized. Please add " + window.location.hostname + " to the Authorized Domains list in your Firebase Console (Authentication > Settings).";
       }
 
       toast({
