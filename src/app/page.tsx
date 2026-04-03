@@ -12,12 +12,19 @@ export default function HomePage() {
 
   useEffect(() => {
     if (!loading) {
-      if (!user) {
-        router.push("/login");
-      } else if (!userProfile?.isProfileComplete) {
-        router.push("/onboarding");
+      if (user) {
+        // Agar profile null hai toh matlab abhi fetch ho raha hai? Wait karo
+        if (userProfile === null) {
+          console.log("Profile loading... waiting");
+          return; // Wait for profile
+        }
+        if (userProfile?.isProfileComplete) {
+          router.push("/dashboard");
+        } else {
+          router.push("/onboarding");
+        }
       } else {
-        router.push("/dashboard");
+        router.push("/login");
       }
     }
   }, [user, userProfile, loading, router]);
