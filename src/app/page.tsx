@@ -75,7 +75,7 @@ export default function StorefrontPage() {
 
           {/* User Account - Top Right */}
           <div className="flex items-center gap-2">
-            <Link href={user ? (userProfile?.isProfileComplete ? "/dashboard" : "/onboarding") : "/login"}>
+            <Link href={user ? "/account" : "/login"}>
               <Button variant="ghost" className="flex items-center gap-2 font-bold text-gray-700 hover:bg-gray-50 rounded-full px-4">
                 <User className="w-5 h-5" />
                 <span className="hidden sm:inline">
@@ -274,7 +274,7 @@ export default function StorefrontPage() {
 
       {/* Mobile Bottom Navigation - Discovery Updated */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 flex items-center justify-around h-20 z-50 px-2 pb-2 shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
-        <Link href="/" className="flex flex-col items-center gap-1.5 text-primary">
+        <Link href="/" className="flex flex-col items-center gap-1.5 text-gray-400 hover:text-primary transition-colors">
           <Home className="w-5 h-5" />
           <span className="text-[10px] font-black uppercase tracking-tighter">Home</span>
         </Link>
@@ -286,7 +286,7 @@ export default function StorefrontPage() {
           <Play className="w-5 h-5" />
           <span className="text-[10px] font-black uppercase tracking-tighter">Play</span>
         </Link>
-        <Link href={user ? "/dashboard" : "/login"} className="flex flex-col items-center gap-1.5 text-gray-400 hover:text-primary transition-colors">
+        <Link href="/account" className="flex flex-col items-center gap-1.5 text-gray-400 hover:text-primary transition-colors">
           <UserCircle className="w-5 h-5" />
           <span className="text-[10px] font-black uppercase tracking-tighter">Account</span>
         </Link>
