@@ -2,39 +2,51 @@
 {
   "placeholderImages": [
     {
-      "id": "earbuds",
-      "description": "Wireless Earbuds Pro",
-      "imageUrl": "https://picsum.photos/seed/earbuds/400/400",
-      "imageHint": "wireless earbuds"
+      "id": "electronics",
+      "description": "Electronics Category",
+      "imageUrl": "https://picsum.photos/seed/electronics/200/200",
+      "imageHint": "electronics devices"
     },
     {
-      "id": "watch",
-      "description": "Smart Watch Series X",
-      "imageUrl": "https://picsum.photos/seed/watch/400/400",
-      "imageHint": "smart watch"
+      "id": "fashion",
+      "description": "Fashion Category",
+      "imageUrl": "https://picsum.photos/seed/fashion/200/200",
+      "imageHint": "fashion clothing"
     },
     {
-      "id": "backpack",
-      "description": "Premium Backpack",
-      "imageUrl": "https://picsum.photos/seed/backpack/400/400",
-      "imageHint": "travel backpack"
+      "id": "grocery",
+      "description": "Grocery Category",
+      "imageUrl": "https://picsum.photos/seed/grocery/200/200",
+      "imageHint": "fresh groceries"
     },
     {
-      "id": "lamp",
-      "description": "Minimalist Desk Lamp",
-      "imageUrl": "https://picsum.photos/seed/lamp/400/400",
-      "imageHint": "desk lamp"
+      "id": "home",
+      "description": "Home Category",
+      "imageUrl": "https://picsum.photos/seed/home/200/200",
+      "imageHint": "home decor"
     },
     {
-      "id": "hero",
-      "description": "E-commerce Hero Background",
-      "imageUrl": "https://picsum.photos/seed/ecommerce/1200/600",
-      "imageHint": "abstract store"
+      "id": "banner1",
+      "description": "Main Hero Banner",
+      "imageUrl": "https://picsum.photos/seed/banner1/1200/400",
+      "imageHint": "shopping banner"
+    },
+    {
+      "id": "prod1",
+      "description": "Product 1",
+      "imageUrl": "https://picsum.photos/seed/p1/400/400",
+      "imageHint": "product item"
+    },
+    {
+      "id": "prod2",
+      "description": "Product 2",
+      "imageUrl": "https://picsum.photos/seed/p2/400/400",
+      "imageHint": "gadget item"
     },
     {
       "id": "logo",
-      "description": "NexaMart Logo Placeholder",
-      "imageUrl": "https://placehold.co/450x135?text=NexaMart",
+      "description": "NexaMart Logo",
+      "imageUrl": "https://i.ibb.co/rfKvSNKL/1000128270-1.png",
       "imageHint": "company logo"
     }
   ]
