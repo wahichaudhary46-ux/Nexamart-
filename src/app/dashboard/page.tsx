@@ -67,8 +67,6 @@ export default function DashboardPage() {
           setRecommendations(res.recommendations || []);
         } catch (error: any) {
           setAiError(true);
-          // 429 errors are handled in the flow with retries, 
-          // but we still catch failures here to update the UI
         } finally {
           setLoadingAI(false);
         }
@@ -97,12 +95,13 @@ export default function DashboardPage() {
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center">
             <Image
-              src="/logo.png"
+              src="https://i.ibb.co/rfKvSNKL/1000128270-1.png"
               alt="NexaMart"
-              width={140}
-              height={40}
+              width={160}
+              height={45}
               className="object-contain"
               priority
+              unoptimized
             />
           </div>
 
