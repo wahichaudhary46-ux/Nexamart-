@@ -61,7 +61,7 @@ export default function LoginPage() {
                 src="https://i.ibb.co/rfKvSNKL/1000128270-1.png"
                 alt="NexaMart" 
                 width={220}
-                height={60}
+                height={10}
                 className="mx-auto object-contain drop-shadow-md dark:invert"
                 priority
                 unoptimized

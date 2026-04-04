@@ -44,7 +44,7 @@ export default function StorefrontPage() {
                 src="https://i.ibb.co/rfKvSNKL/1000128270-1.png"
                 alt="NexaMart"
                 width={1500}
-                height={60}
+                height={10}
                 className="w-full h-auto object-contain dark:invert"
                 priority
                 unoptimized
