@@ -127,9 +127,9 @@ export default function DashboardPage() {
               <Image 
                 src="https://i.ibb.co/rfKvSNKL/1000128270-1.png" 
                 alt="Logo" 
-                width={500} 
-                height={40} 
-                className="w-full h-auto object-contain dark:invert" 
+                width={120} 
+                height={24} 
+                className="h-auto object-contain dark:invert" 
                 unoptimized 
               />
             </motion.div>
