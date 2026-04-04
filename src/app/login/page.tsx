@@ -58,10 +58,10 @@ export default function LoginPage() {
           <div className="flex justify-center mb-10">
             <div className="relative">
               <Image
-                src="https://i.ibb.co/rfKvSNKL/1000128270-1.png"
+                src="https://i.ibb.co/Gw4NTkh/IMG-20260404-105238.png"
                 alt="NexaMart" 
-                width={300}
-                height={80}
+                width={350}
+                height={65}
                 className="mx-auto object-contain drop-shadow-md"
                 priority
                 unoptimized
