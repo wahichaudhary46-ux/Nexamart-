@@ -6,16 +6,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { 
   Search, 
-  ShoppingCart, 
   User, 
-  Menu, 
   MapPin, 
   ChevronRight,
   Home,
   Grid,
-  ShoppingBag,
-  UserCircle,
-  Plus
+  Play,
+  UserCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -47,148 +44,164 @@ export default function StorefrontPage() {
   const [searchQuery, setSearchQuery] = useState("");
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col pb-20 md:pb-0">
-      {/* Top Navbar */}
-      <header className="bg-white border-b sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center gap-4">
+    <div className="min-h-screen bg-white flex flex-col pb-20 md:pb-0 font-body">
+      {/* Top Navbar - Clean & Discovery Focused */}
+      <header className="bg-white sticky top-0 z-50 border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between gap-4">
+          {/* Logo - Top Left */}
           <Link href="/" className="flex-shrink-0">
             <Image
               src="https://i.ibb.co/rfKvSNKL/1000128270-1.png"
               alt="NexaMart"
-              width={140}
-              height={40}
+              width={160}
+              height={46}
               className="object-contain"
               unoptimized
             />
           </Link>
 
-          <div className="flex-1 hidden md:flex items-center relative group">
-            <div className="absolute left-3 text-gray-400">
+          {/* Centered Google-style Search Bar */}
+          <div className="flex-1 max-w-2xl hidden md:flex items-center relative group">
+            <div className="absolute left-5 text-gray-400">
               <Search className="w-5 h-5" />
             </div>
             <Input 
-              placeholder="Search for products, stores and more..." 
-              className="pl-10 h-10 w-full bg-gray-100 border-none rounded-lg focus-visible:ring-primary/20"
+              placeholder="Search local products, stores and more..." 
+              className="pl-12 h-12 w-full bg-white border border-gray-200 rounded-full shadow-sm hover:shadow-md transition-shadow focus-visible:ring-primary/20 text-base"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
 
-          <div className="flex items-center gap-2 md:gap-6">
+          {/* User Account - Top Right */}
+          <div className="flex items-center gap-2">
             <Link href={user ? (userProfile?.isProfileComplete ? "/dashboard" : "/onboarding") : "/login"}>
-              <Button variant="ghost" className="flex items-center gap-2 font-bold text-gray-700 hidden md:flex">
+              <Button variant="ghost" className="flex items-center gap-2 font-bold text-gray-700 hover:bg-gray-50 rounded-full px-4">
                 <User className="w-5 h-5" />
-                {user ? (userProfile?.fullName?.split(' ')[0] || 'Account') : 'Login'}
+                <span className="hidden sm:inline">
+                  {user ? (userProfile?.fullName?.split(' ')[0] || 'Account') : 'Sign In'}
+                </span>
               </Button>
             </Link>
+          </div>
+        </div>
 
-            <Button variant="ghost" size="icon" className="relative text-gray-700">
-              <ShoppingCart className="w-6 h-6" />
-              <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-primary text-white text-[10px] border-2 border-white">
-                0
-              </Badge>
-            </Button>
-
-            <Button variant="ghost" size="icon" className="md:hidden text-gray-700">
-              <Search className="w-6 h-6" />
-            </Button>
+        {/* Mobile Search - Google Style */}
+        <div className="md:hidden px-4 pb-4 bg-white">
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Input 
+              placeholder="Search local products..." 
+              className="pl-10 h-11 bg-white border border-gray-200 rounded-full shadow-sm text-sm"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
         </div>
       </header>
 
-      {/* Mobile Search Bar */}
-      <div className="md:hidden bg-white px-4 pb-3 border-b">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <Input 
-            placeholder="Search products..." 
-            className="pl-9 h-10 bg-gray-100 border-none rounded-lg"
-          />
-        </div>
-      </div>
-
-      <main className="flex-1 w-full max-w-7xl mx-auto px-4 py-4 space-y-6">
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 py-6 space-y-8">
         {/* Category Strip */}
-        <div className="flex items-center gap-6 overflow-x-auto pb-2 scrollbar-hide no-scrollbar">
-          {categories.map((cat) => (
-            <div key={cat.name} className="flex flex-col items-center gap-2 flex-shrink-0 cursor-pointer group">
-              <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-white border border-gray-100 shadow-sm overflow-hidden p-1 transition-transform group-hover:scale-105">
-                <div className="relative w-full h-full rounded-full overflow-hidden">
-                  <Image 
-                    src={cat.icon} 
-                    alt={cat.name} 
-                    fill 
-                    className="object-cover" 
-                    data-ai-hint={cat.hint}
-                  />
+        <section>
+          <div className="flex items-center gap-8 overflow-x-auto pb-4 scrollbar-hide no-scrollbar">
+            {categories.map((cat) => (
+              <div key={cat.name} className="flex flex-col items-center gap-2 flex-shrink-0 cursor-pointer group">
+                <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-white border border-gray-100 shadow-sm overflow-hidden p-1 transition-transform group-hover:scale-110">
+                  <div className="relative w-full h-full rounded-full overflow-hidden">
+                    <Image 
+                      src={cat.icon} 
+                      alt={cat.name} 
+                      fill 
+                      className="object-cover" 
+                      data-ai-hint={cat.hint}
+                    />
+                  </div>
                 </div>
+                <span className="text-[11px] md:text-xs font-bold text-gray-600 uppercase tracking-tight">{cat.name}</span>
               </div>
-              <span className="text-xs md:text-sm font-bold text-gray-700">{cat.name}</span>
-            </div>
-          ))}
-        </div>
-
-        {/* Hero Banner Section */}
-        <section className="relative w-full h-40 md:h-80 rounded-2xl overflow-hidden bg-gradient-to-r from-blue-600 to-indigo-700">
-          <Image 
-            src="https://picsum.photos/seed/banner1/1200/400" 
-            alt="Big Saving Days" 
-            fill 
-            className="object-cover opacity-90"
-            priority
-            data-ai-hint="shopping discount"
-          />
-          <div className="absolute inset-0 bg-black/10 flex flex-col justify-center px-8 md:px-16 text-white space-y-2 md:space-y-4">
-            <Badge className="w-fit bg-yellow-400 text-black font-bold">LIMITED OFFER</Badge>
-            <h2 className="text-2xl md:text-5xl font-black leading-tight">BIG SAVING DAYS</h2>
-            <p className="text-sm md:text-lg font-medium opacity-90">Up to 70% Off on Local Brands</p>
-            <Button className="w-fit bg-white text-primary hover:bg-white/90 font-bold px-8">Shop Now</Button>
+            ))}
           </div>
         </section>
 
-        {/* Location Tag */}
-        <div className="flex items-center gap-2 text-sm text-gray-500 font-medium">
-          <MapPin className="w-4 h-4 text-primary" />
-          <span>Showing stores near <span className="text-gray-900 font-bold">A-45, South Delhi</span></span>
-          <ChevronRight className="w-4 h-4" />
+        {/* Hero Banner Section */}
+        <section className="relative w-full h-44 md:h-96 rounded-3xl overflow-hidden shadow-sm">
+          <Image 
+            src="https://picsum.photos/seed/banner1/1200/400" 
+            alt="Discover Local" 
+            fill 
+            className="object-cover"
+            priority
+            data-ai-hint="shopping discount"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent flex flex-col justify-center px-8 md:px-20 text-white space-y-3 md:space-y-6">
+            <Badge className="w-fit bg-primary text-white font-bold px-3 py-1">HYPERLOCAL</Badge>
+            <h2 className="text-2xl md:text-6xl font-black leading-tight max-w-lg">FIND IT AT YOUR NEAREST STORE</h2>
+            <p className="text-sm md:text-xl font-medium opacity-90">Instant discovery of local inventory</p>
+            <Button className="w-fit bg-white text-primary hover:bg-gray-100 font-black px-10 h-12 md:h-14 rounded-full transition-all">Explore Stores</Button>
+          </div>
+        </section>
+
+        {/* Location & Discovery Tag */}
+        <div className="flex items-center justify-between py-2 border-y border-gray-50">
+          <div className="flex items-center gap-2 text-sm text-gray-500 font-semibold">
+            <MapPin className="w-4 h-4 text-primary" />
+            <span>Discovering in <span className="text-primary font-black underline decoration-2 underline-offset-4">South Delhi, India</span></span>
+          </div>
+          <Button variant="ghost" size="sm" className="text-xs font-bold text-gray-400">Change Location</Button>
         </div>
 
-        {/* Product Grid */}
-        <section className="space-y-4">
+        {/* Product Grid - Discovery Focused */}
+        <section className="space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-black text-gray-900">Discover Local Products</h2>
-            <Button variant="link" className="text-primary font-bold">View All</Button>
+            <h2 className="text-2xl font-black text-gray-900 tracking-tight">Top Local Discoveries</h2>
+            <Button variant="link" className="text-primary font-bold">View More</Button>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
             {products.map((product) => (
-              <Card key={product.id} className="group overflow-hidden border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+              <Card key={product.id} className="group overflow-hidden border-none shadow-none hover:shadow-xl transition-all duration-300 rounded-2xl bg-white">
                 <CardContent className="p-0">
-                  <div className="relative aspect-square overflow-hidden bg-gray-100">
+                  <div className="relative aspect-square overflow-hidden bg-gray-50 rounded-2xl">
                     <Image 
                       src={product.img} 
                       alt={product.name} 
                       fill 
-                      className="object-cover transition-transform group-hover:scale-105" 
+                      className="object-cover transition-transform duration-500 group-hover:scale-105" 
                       data-ai-hint="product image"
                     />
-                    <Badge className="absolute top-2 left-2 bg-emerald-500 text-white font-bold border-none">
-                      In Stock
+                    <Badge className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-primary font-black text-[10px] border-none px-2 shadow-sm">
+                      VERIFIED STOCK
                     </Badge>
                   </div>
-                  <div className="p-3 space-y-1">
-                    <p className="text-xs text-gray-500 font-medium">{product.shop}</p>
-                    <h3 className="text-sm font-bold text-gray-900 line-clamp-1">{product.name}</h3>
-                    <div className="flex items-center gap-1">
-                      <span className="text-yellow-500">★</span>
-                      <span className="text-xs font-bold text-gray-600">{product.rating}</span>
+                  
+                  <div className="p-4 space-y-2">
+                    <div className="flex items-center gap-1.5 text-primary">
+                      <MapPin className="w-3.5 h-3.5" />
+                      <p className="text-xs font-black uppercase tracking-wider">
+                        Available at: <span className="text-gray-900 underline decoration-primary/30">{product.shop}</span>
+                      </p>
                     </div>
-                    <div className="pt-1 flex items-baseline gap-2">
-                      <span className="text-lg font-black text-gray-900">{product.price}</span>
-                      <span className="text-xs text-gray-400 line-through font-medium">{product.oldPrice}</span>
+                    
+                    <h3 className="text-sm md:text-base font-bold text-gray-800 line-clamp-1 group-hover:text-primary transition-colors">
+                      {product.name}
+                    </h3>
+                    
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded text-[10px] font-bold">
+                        ★ {product.rating}
+                      </div>
+                      <span className="text-[10px] text-gray-400 font-bold uppercase">100+ views today</span>
                     </div>
-                    <Button className="w-full mt-2 bg-primary hover:bg-primary/90 text-white font-bold text-xs h-9">
-                      Add to Cart
-                    </Button>
+
+                    <div className="pt-2 flex items-center justify-between border-t border-gray-50 mt-2">
+                      <div className="flex flex-col">
+                        <span className="text-lg font-black text-gray-900 leading-tight">{product.price}</span>
+                        <span className="text-[10px] text-gray-400 line-through font-bold">{product.oldPrice}</span>
+                      </div>
+                      <Button className="bg-primary hover:bg-primary/90 text-white font-black text-[10px] h-9 rounded-xl px-4 shadow-sm">
+                        Locate Store
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -196,76 +209,86 @@ export default function StorefrontPage() {
           </div>
         </section>
 
-        {/* Trending Section */}
-        <section className="bg-primary/5 rounded-2xl p-6 border border-primary/10">
-          <div className="flex flex-col md:flex-row items-center gap-6">
-            <div className="flex-1 space-y-2 text-center md:text-left">
-              <h2 className="text-2xl font-black text-primary">NexaMart Local Choice</h2>
-              <p className="text-gray-600 font-medium">Verified products from top-rated local shopkeepers.</p>
-              <Button className="bg-primary font-bold rounded-lg px-8">Explore Stores</Button>
+        {/* Local Stores Promotion */}
+        <section className="bg-gray-900 rounded-[2.5rem] p-8 md:p-16 text-white overflow-hidden relative">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 blur-[100px] rounded-full" />
+          <div className="flex flex-col md:flex-row items-center gap-12 relative z-10">
+            <div className="flex-1 space-y-6 text-center md:text-left">
+              <h2 className="text-3xl md:text-5xl font-black">SUPPORT YOUR LOCAL SHOPKEEPERS</h2>
+              <p className="text-gray-400 text-lg font-medium max-w-xl">
+                NexMart connects you directly with the verified local businesses in your area. Discover deals, check availability, and shop local.
+              </p>
+              <div className="flex flex-wrap justify-center md:justify-start gap-4 pt-4">
+                <Button className="bg-primary hover:bg-primary/90 font-black rounded-full px-10 h-14">Find Shops Near Me</Button>
+                <Button variant="outline" className="border-white/20 text-white hover:bg-white/10 font-black rounded-full px-10 h-14">Partner with Us</Button>
+              </div>
             </div>
-            <div className="flex gap-4 overflow-hidden">
-               <div className="relative w-32 h-32 rounded-xl overflow-hidden shadow-lg rotate-3">
-                  <Image src="https://picsum.photos/seed/t1/300/300" alt="Trend" fill className="object-cover" />
+            <div className="flex gap-6">
+               <div className="relative w-40 h-56 md:w-56 md:h-72 rounded-3xl overflow-hidden shadow-2xl rotate-3">
+                  <Image src="https://picsum.photos/seed/t1/300/400" alt="Local Shop" fill className="object-cover" />
                </div>
-               <div className="relative w-32 h-32 rounded-xl overflow-hidden shadow-lg -rotate-3">
-                  <Image src="https://picsum.photos/seed/t2/300/300" alt="Trend" fill className="object-cover" />
+               <div className="relative w-40 h-56 md:w-56 md:h-72 rounded-3xl overflow-hidden shadow-2xl -rotate-6 mt-8 hidden sm:block">
+                  <Image src="https://picsum.photos/seed/t2/300/400" alt="Local Inventory" fill className="object-cover" />
                </div>
             </div>
           </div>
         </section>
       </main>
 
-      {/* Desktop Footer */}
-      <footer className="hidden md:block bg-gray-900 text-white py-12 mt-12">
-        <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div className="space-y-4">
-             <Image src="https://i.ibb.co/rfKvSNKL/1000128270-1.png" alt="NexaMart" width={140} height={40} className="brightness-0 invert object-contain" unoptimized />
-             <p className="text-gray-400 text-sm">Empowering local stores with the reach of the internet. Shop smart, shop local.</p>
+      {/* Desktop Footer - Minimal */}
+      <footer className="hidden md:block bg-white border-t border-gray-100 py-16 mt-16">
+        <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-12">
+          <div className="space-y-6">
+             <Image src="https://i.ibb.co/rfKvSNKL/1000128270-1.png" alt="NexaMart" width={160} height={46} className="object-contain" unoptimized />
+             <p className="text-gray-400 text-sm font-medium leading-relaxed">The ultimate discovery platform for local commerce. Find everything in your neighborhood instantly.</p>
           </div>
           <div className="space-y-4">
-            <h4 className="font-bold">Company</h4>
-            <ul className="text-gray-400 text-sm space-y-2">
-              <li className="hover:text-white cursor-pointer transition-colors">About Us</li>
-              <li className="hover:text-white cursor-pointer transition-colors">Careers</li>
-              <li className="hover:text-white cursor-pointer transition-colors">Blog</li>
+            <h4 className="font-black text-gray-900 uppercase text-xs tracking-widest">Platform</h4>
+            <ul className="text-gray-500 text-sm space-y-3 font-bold">
+              <li className="hover:text-primary cursor-pointer transition-colors">Store Discovery</li>
+              <li className="hover:text-primary cursor-pointer transition-colors">Local Inventory</li>
+              <li className="hover:text-primary cursor-pointer transition-colors">Verified Shops</li>
             </ul>
           </div>
           <div className="space-y-4">
-            <h4 className="font-bold">Support</h4>
-            <ul className="text-gray-400 text-sm space-y-2">
-              <li className="hover:text-white cursor-pointer transition-colors">Help Center</li>
-              <li className="hover:text-white cursor-pointer transition-colors">Privacy Policy</li>
-              <li className="hover:text-white cursor-pointer transition-colors">Terms of Service</li>
+            <h4 className="font-black text-gray-900 uppercase text-xs tracking-widest">Resources</h4>
+            <ul className="text-gray-500 text-sm space-y-3 font-bold">
+              <li className="hover:text-primary cursor-pointer transition-colors">Terms of Service</li>
+              <li className="hover:text-primary cursor-pointer transition-colors">Privacy Policy</li>
+              <li className="hover:text-primary cursor-pointer transition-colors">Store Partner Portal</li>
             </ul>
           </div>
           <div className="space-y-4">
-            <h4 className="font-bold">Contact</h4>
-            <ul className="text-gray-400 text-sm space-y-2">
+            <h4 className="font-black text-gray-900 uppercase text-xs tracking-widest">Help & Social</h4>
+            <ul className="text-gray-500 text-sm space-y-3 font-bold">
               <li>support@nexamart.com</li>
-              <li>+91 1800-LOCAL-MART</li>
+              <li className="hover:text-primary cursor-pointer transition-colors">Instagram</li>
+              <li className="hover:text-primary cursor-pointer transition-colors">Twitter</li>
             </ul>
           </div>
         </div>
+        <div className="max-w-7xl mx-auto px-4 mt-16 pt-8 border-t border-gray-50 text-center">
+          <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest">© {new Date().getFullYear()} NEXAMART PLATFORMS INC. ALL RIGHTS RESERVED.</p>
+        </div>
       </footer>
 
-      {/* Mobile Bottom Navigation */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t flex items-center justify-around h-16 z-50 px-2">
-        <Link href="/" className="flex flex-col items-center gap-1 text-primary">
+      {/* Mobile Bottom Navigation - Discovery Updated */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 flex items-center justify-around h-20 z-50 px-2 pb-2 shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
+        <Link href="/" className="flex flex-col items-center gap-1.5 text-primary">
           <Home className="w-5 h-5" />
-          <span className="text-[10px] font-bold">Home</span>
+          <span className="text-[10px] font-black uppercase tracking-tighter">Home</span>
         </Link>
-        <Link href="#" className="flex flex-col items-center gap-1 text-gray-500">
+        <Link href="#" className="flex flex-col items-center gap-1.5 text-gray-400 hover:text-primary transition-colors">
           <Grid className="w-5 h-5" />
-          <span className="text-[10px] font-bold">Categories</span>
+          <span className="text-[10px] font-black uppercase tracking-tighter">Categories</span>
         </Link>
-        <Link href="#" className="flex flex-col items-center gap-1 text-gray-500">
-          <ShoppingBag className="w-5 h-5" />
-          <span className="text-[10px] font-bold">My Orders</span>
+        <Link href="#" className="flex flex-col items-center gap-1.5 text-gray-400 hover:text-primary transition-colors">
+          <Play className="w-5 h-5" />
+          <span className="text-[10px] font-black uppercase tracking-tighter">Play</span>
         </Link>
-        <Link href={user ? "/dashboard" : "/login"} className="flex flex-col items-center gap-1 text-gray-500">
+        <Link href={user ? "/dashboard" : "/login"} className="flex flex-col items-center gap-1.5 text-gray-400 hover:text-primary transition-colors">
           <UserCircle className="w-5 h-5" />
-          <span className="text-[10px] font-bold">Account</span>
+          <span className="text-[10px] font-black uppercase tracking-tighter">Account</span>
         </Link>
       </nav>
     </div>
