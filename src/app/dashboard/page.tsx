@@ -122,7 +122,7 @@ export default function DashboardPage() {
         <div className="p-6 flex items-center justify-between">
           {isSidebarOpen && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <Image src="https://i.ibb.co/rfKvSNKL/1000128270-1.png" alt="Logo" width={1500} height={10} className="dark:invert" unoptimized />
+              <Image src="https://i.ibb.co/rfKvSNKL/1000128270-1.png" alt="Logo" width={1500} height={15} className="dark:invert" unoptimized />
             </motion.div>
           )}
           <Button variant="ghost" size="icon" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
@@ -139,7 +139,7 @@ export default function DashboardPage() {
         </nav>
 
         <div className="p-4 border-t border-border">
-          <NavItem icon={LogOut} label="Log Out" />
+          <NavItem icon={LogOut} label="Log Out" onClick={handleSignOut} />
         </div>
       </motion.aside>
 
