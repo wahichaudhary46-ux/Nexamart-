@@ -34,35 +34,26 @@ export default function StorefrontPage() {
   return (
     <div className="min-h-screen bg-background flex flex-col pb-20 md:pb-0 font-body transition-colors duration-300">
       {/* Top Section: Header + Location Bar */}
-      <div className="bg-slate-100 dark:bg-gray-950 border-b border-border transition-colors duration-300">
-        <header className="max-w-7xl mx-auto px-4 py-4 md:py-0 md:h-24 flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-8">
+      <div className="bg-background border-b border-border transition-colors duration-300">
+        <header className="max-w-7xl mx-auto px-4 pt-8 pb-4 flex flex-col items-center gap-6">
           
-          {/* Row 1: Logo & Notification (Mobile) / Left Side (Desktop) */}
-          <div className="flex items-center justify-between w-full md:w-auto">
-            <Link href="/" className="flex-shrink-0">
-              <div className="relative w-[180px] h-[45px] md:w-[220px] md:h-[60px]">
-                <Image
-                  src="https://i.ibb.co/rfKvSNKL/1000128270-1.png"
-                  alt="NexaMart"
-                  fill
-                  className="object-contain dark:invert"
-                  unoptimized
-                />
-              </div>
-            </Link>
-            
-            {/* Notification Icon (Mobile Only) */}
-            <div className="md:hidden">
-              <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-primary transition-colors">
-                <Bell className="w-6 h-6" />
-                <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-slate-100 dark:border-gray-950" />
-              </Button>
+          {/* Row 1: Big Logo (Full width centered) */}
+          <Link href="/" className="flex-shrink-0 w-full flex justify-center">
+            <div className="relative w-[280px] h-[70px] md:w-[450px] md:h-[120px]">
+              <Image
+                src="https://i.ibb.co/rfKvSNKL/1000128270-1.png"
+                alt="NexaMart"
+                fill
+                className="object-contain dark:invert"
+                priority
+                unoptimized
+              />
             </div>
-          </div>
+          </Link>
 
-          {/* Row 2: Search Bar (Mobile Full Width) / Center (Desktop Flexible) */}
-          <div className="w-full md:flex-grow max-w-3xl">
-            <div className="relative group w-full">
+          {/* Row 2: Search Bar + Notification Icon together */}
+          <div className="w-full max-w-4xl flex items-center gap-3">
+            <div className="relative flex-grow group">
               <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
                 <Search className="w-5 h-5" />
               </div>
@@ -73,19 +64,16 @@ export default function StorefrontPage() {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-          </div>
-
-          {/* Notification Icon (Desktop Only) */}
-          <div className="hidden md:flex flex-shrink-0 items-center gap-2">
-            <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-primary transition-colors">
-              <Bell className="w-6 h-6" />
-              <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-slate-100 dark:border-gray-950" />
+            
+            <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-primary transition-colors h-12 w-12 md:h-14 md:w-14 shrink-0 rounded-full bg-slate-50 dark:bg-gray-900 border border-border shadow-sm">
+              <Bell className="w-6 h-6 md:w-7 md:h-7" />
+              <span className="absolute top-3 right-3 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-background" />
             </Button>
           </div>
         </header>
 
         {/* Location Bar */}
-        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between border-t border-border/50 bg-slate-100/50 dark:bg-gray-950/50">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between border-t border-border/50 bg-background">
           <div className="flex items-center gap-2 text-sm text-muted-foreground font-semibold truncate">
             <MapPin className="w-4 h-4 text-primary shrink-0" />
             <span className="truncate">
