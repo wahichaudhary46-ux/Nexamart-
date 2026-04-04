@@ -122,7 +122,7 @@ export default function DashboardPage() {
         <div className="p-6 flex items-center justify-between">
           {isSidebarOpen && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <Image src="https://i.ibb.co/rfKvSNKL/1000128270-1.png" alt="Logo" width={140} height={40} className="dark:invert" unoptimized />
+              <Image src="https://i.ibb.co/tT1x8W10/IMG-20260405-002022.jpg" alt="Logo" width={100} height={30} className="dark:invert" unoptimized />
             </motion.div>
           )}
           <Button variant="ghost" size="icon" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>

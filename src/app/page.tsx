@@ -33,48 +33,59 @@ export default function StorefrontPage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col pb-20 md:pb-0 font-body transition-colors duration-300">
-      {/* Combined Top Header & Location Bar */}
-      <div className="bg-background border-b border-border">
-        <header className="max-w-7xl mx-auto px-4 h-16 md:h-24 flex flex-row items-center justify-between gap-6">
-          {/* Logo - Top Left */}
-          <Link href="/" className="flex-shrink-0">
-            <div className="relative w-[180px] h-[45px] md:w-[220px] md:h-[60px]">
-              <Image
-                src="https://i.ibb.co/rfKvSNKL/1000128270-1.png"
-                alt="NexaMart"
-                fill
-                className="object-contain dark:invert"
-                unoptimized
-              />
+      {/* Top Section: Header + Location Bar */}
+      <div className="bg-slate-100 dark:bg-gray-950 border-b border-border transition-colors duration-300">
+        <header className="max-w-7xl mx-auto px-4 py-4 md:py-0 md:h-24 flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-8">
+          
+          {/* Row 1: Logo & Notification (Mobile) / Left Side (Desktop) */}
+          <div className="flex items-center justify-between w-full md:w-auto">
+            <Link href="/" className="flex-shrink-0">
+              <div className="relative w-[180px] h-[45px] md:w-[220px] md:h-[60px]">
+                <Image
+                  src="https://i.ibb.co/rfKvSNKL/1000128270-1.png"
+                  alt="NexaMart"
+                  fill
+                  className="object-contain dark:invert"
+                  unoptimized
+                />
+              </div>
+            </Link>
+            
+            {/* Notification Icon (Mobile Only) */}
+            <div className="md:hidden">
+              <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-primary transition-colors">
+                <Bell className="w-6 h-6" />
+                <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-slate-100 dark:border-gray-950" />
+              </Button>
             </div>
-          </Link>
+          </div>
 
-          {/* Flexible Google-style Search Bar */}
-          <div className="flex-grow flex items-center justify-center max-w-3xl">
-            <div className="relative w-full group">
-              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground">
+          {/* Row 2: Search Bar (Mobile Full Width) / Center (Desktop Flexible) */}
+          <div className="w-full md:flex-grow max-w-3xl">
+            <div className="relative group w-full">
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
                 <Search className="w-5 h-5" />
               </div>
               <Input 
                 placeholder="Search local products..." 
-                className="pl-12 h-12 md:h-14 w-full bg-muted border border-border rounded-full shadow-sm hover:shadow-md transition-shadow focus-visible:ring-primary/20 text-base"
+                className="pl-12 h-12 md:h-14 w-full bg-white dark:bg-gray-900 border border-border rounded-full shadow-sm hover:shadow-md transition-shadow focus-visible:ring-primary/20 text-base"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
           </div>
 
-          {/* Right Side - Tools */}
-          <div className="flex-shrink-0 flex items-center gap-2">
+          {/* Notification Icon (Desktop Only) */}
+          <div className="hidden md:flex flex-shrink-0 items-center gap-2">
             <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-primary transition-colors">
               <Bell className="w-6 h-6" />
-              <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-background" />
+              <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-slate-100 dark:border-gray-950" />
             </Button>
           </div>
         </header>
 
         {/* Location Bar */}
-        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between border-t border-border bg-muted/30">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between border-t border-border/50 bg-slate-100/50 dark:bg-gray-950/50">
           <div className="flex items-center gap-2 text-sm text-muted-foreground font-semibold truncate">
             <MapPin className="w-4 h-4 text-primary shrink-0" />
             <span className="truncate">
@@ -93,7 +104,7 @@ export default function StorefrontPage() {
       </div>
 
       {/* Main Content Area */}
-      <main className="flex-1 w-full bg-background">
+      <main className="flex-1 w-full bg-white dark:bg-black transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 py-6 space-y-8">
           
           {/* Hero Banner Section */}
@@ -142,7 +153,7 @@ export default function StorefrontPage() {
                       <div className="flex items-center gap-1.5 text-primary">
                         <MapPin className="w-3.5 h-3.5" />
                         <p className="text-xs font-black uppercase tracking-wider">
-                          Available at: <span className="text-foreground underline decoration-primary/30">{product.shop}</span>
+                          Available at: <span className="text-foreground underline decoration-primary/30 font-black">{product.shop}</span>
                         </p>
                       </div>
                       
@@ -201,7 +212,7 @@ export default function StorefrontPage() {
       </main>
 
       {/* Desktop Footer - Minimal */}
-      <footer className="hidden md:block bg-background border-t border-border py-16 mt-16">
+      <footer className="hidden md:block bg-white dark:bg-black border-t border-border py-16 mt-16 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-12">
           <div className="space-y-6">
              <div className="relative w-[180px] h-[50px]">
@@ -239,8 +250,8 @@ export default function StorefrontPage() {
         </div>
       </footer>
 
-      {/* Mobile Bottom Navigation - White Background */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-background border-t border-border flex items-center justify-around h-20 z-50 px-2 pb-2 shadow-[0_-4px_20px_rgba(0,0,0,0.03)] transition-colors duration-300">
+      {/* Mobile Bottom Navigation */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-black border-t border-border flex items-center justify-around h-20 z-50 px-2 pb-2 shadow-[0_-4px_20px_rgba(0,0,0,0.03)] transition-colors duration-300">
         <Link href="/" className="flex flex-col items-center gap-1.5 text-primary">
           <Home className="w-5 h-5" />
           <span className="text-[10px] font-black uppercase tracking-tighter">Home</span>
