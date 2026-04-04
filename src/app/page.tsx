@@ -33,8 +33,8 @@ export default function StorefrontPage() {
 
   return (
     <div className="min-h-screen bg-white flex flex-col pb-20 md:pb-0 font-body">
-      {/* Combined Top Header & Location Bar - Amazon Inspired */}
-      <div className="bg-gray-100 sticky top-0 z-50 border-b border-gray-200">
+      {/* Combined Top Header & Location Bar - Normal Scrolling */}
+      <div className="bg-gray-100 border-b border-gray-200">
         <header className="max-w-7xl mx-auto px-4 h-16 md:h-20 flex flex-row items-center justify-between gap-4">
           {/* Logo - Top Left */}
           <Link href="/" className="flex-shrink-0">
