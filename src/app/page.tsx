@@ -18,7 +18,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { ThemeToggle } from "@/components/theme-toggle";
 
 const products = [
   { id: 1, name: "Wireless Pro Earbuds", price: "₹1,999", oldPrice: "₹3,999", rating: 4.5, shop: "Grover Electronics", img: "https://picsum.photos/seed/p1/400/400" },
@@ -36,10 +35,10 @@ export default function StorefrontPage() {
     <div className="min-h-screen bg-background flex flex-col pb-20 md:pb-0 font-body transition-colors duration-300">
       {/* Combined Top Header & Location Bar */}
       <div className="bg-background border-b border-border">
-        <header className="max-w-7xl mx-auto px-4 h-16 md:h-20 flex flex-row items-center justify-between gap-4">
+        <header className="max-w-7xl mx-auto px-4 h-16 md:h-24 flex flex-row items-center justify-between gap-6">
           {/* Logo - Top Left */}
           <Link href="/" className="flex-shrink-0">
-            <div className="relative w-[120px] h-[36px] md:w-[160px] md:h-[46px]">
+            <div className="relative w-[180px] h-[45px] md:w-[220px] md:h-[60px]">
               <Image
                 src="https://i.ibb.co/rfKvSNKL/1000128270-1.png"
                 alt="NexaMart"
@@ -51,14 +50,14 @@ export default function StorefrontPage() {
           </Link>
 
           {/* Flexible Google-style Search Bar */}
-          <div className="flex-grow flex items-center justify-center max-w-2xl">
+          <div className="flex-grow flex items-center justify-center max-w-3xl">
             <div className="relative w-full group">
               <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground">
-                <Search className="w-4 h-4" />
+                <Search className="w-5 h-5" />
               </div>
               <Input 
                 placeholder="Search local products..." 
-                className="pl-10 h-10 md:h-12 w-full bg-muted border border-border rounded-full shadow-sm hover:shadow-md transition-shadow focus-visible:ring-primary/20 text-sm"
+                className="pl-12 h-12 md:h-14 w-full bg-muted border border-border rounded-full shadow-sm hover:shadow-md transition-shadow focus-visible:ring-primary/20 text-base"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -66,17 +65,16 @@ export default function StorefrontPage() {
           </div>
 
           {/* Right Side - Tools */}
-          <div className="flex-shrink-0 flex items-center gap-1">
-            <ThemeToggle />
+          <div className="flex-shrink-0 flex items-center gap-2">
             <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-primary transition-colors">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-background" />
+              <Bell className="w-6 h-6" />
+              <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-background" />
             </Button>
           </div>
         </header>
 
         {/* Location Bar */}
-        <div className="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between border-t border-border">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between border-t border-border bg-muted/30">
           <div className="flex items-center gap-2 text-sm text-muted-foreground font-semibold truncate">
             <MapPin className="w-4 h-4 text-primary shrink-0" />
             <span className="truncate">
@@ -109,7 +107,7 @@ export default function StorefrontPage() {
               data-ai-hint="shopping discount"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent flex flex-col justify-center px-8 md:px-20 text-white space-y-3 md:space-y-6">
-              <Badge className="w-fit bg-primary text-white font-bold px-3 py-1">HYPERLOCAL</Badge>
+              <Badge className="w-fit bg-primary text-white font-bold px-3 py-1 border-none">HYPERLOCAL</Badge>
               <h2 className="text-2xl md:text-6xl font-black leading-tight max-w-lg">FIND IT AT YOUR NEAREST STORE</h2>
               <p className="text-sm md:text-xl font-medium opacity-90">Instant discovery of local inventory</p>
               <Button className="w-fit bg-white text-primary hover:bg-gray-100 font-black px-10 h-12 md:h-14 rounded-full transition-all">Explore Stores</Button>
@@ -176,7 +174,7 @@ export default function StorefrontPage() {
           </section>
 
           {/* Local Shops Promotion */}
-          <section className="bg-gray-900 dark:bg-card rounded-[2.5rem] p-8 md:p-16 text-white overflow-hidden relative border border-border">
+          <section className="bg-black dark:bg-card rounded-[2.5rem] p-8 md:p-16 text-white overflow-hidden relative border border-border">
             <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 blur-[100px] rounded-full" />
             <div className="flex flex-col md:flex-row items-center gap-12 relative z-10">
               <div className="flex-1 space-y-6 text-center md:text-left">
@@ -185,7 +183,7 @@ export default function StorefrontPage() {
                   NexMart connects you directly with the verified local businesses in your area. Discover deals, check availability, and shop local.
                 </p>
                 <div className="flex flex-wrap justify-center md:justify-start gap-4 pt-4">
-                  <Button className="bg-primary hover:bg-primary/90 font-black rounded-full px-10 h-14">Find Shops Near Me</Button>
+                  <Button className="bg-primary hover:bg-primary/90 font-black rounded-full px-10 h-14 border-none">Find Shops Near Me</Button>
                   <Button variant="outline" className="border-white/20 dark:border-border text-white hover:bg-white/10 dark:hover:bg-muted font-black rounded-full px-10 h-14">Partner with Us</Button>
                 </div>
               </div>
@@ -206,7 +204,7 @@ export default function StorefrontPage() {
       <footer className="hidden md:block bg-background border-t border-border py-16 mt-16">
         <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-12">
           <div className="space-y-6">
-             <div className="relative w-[160px] h-[46px]">
+             <div className="relative w-[180px] h-[50px]">
                <Image src="https://i.ibb.co/rfKvSNKL/1000128270-1.png" alt="NexaMart" fill className="object-contain dark:invert" unoptimized />
              </div>
              <p className="text-muted-foreground text-sm font-medium leading-relaxed">The ultimate discovery platform for local commerce. Find everything in your neighborhood instantly.</p>

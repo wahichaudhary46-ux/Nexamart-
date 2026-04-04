@@ -36,14 +36,14 @@ export default function LoginPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <Spinner className="h-8 w-8 text-primary" />
       </div>
     );
   }
 
   return (
-    <div className="relative min-h-screen w-full flex items-center justify-center bg-gray-50 dark:bg-gray-950 px-4 py-12 transition-colors duration-300">
+    <div className="relative min-h-screen w-full flex items-center justify-center bg-background px-4 py-12 transition-colors duration-300">
       {/* Subtle background pattern */}
       <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]" />
       
@@ -53,16 +53,16 @@ export default function LoginPage() {
         transition={{ duration: 0.5, ease: "easeOut" }}
         className="w-full max-w-md z-10"
       >
-        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] border border-gray-200 dark:border-gray-800 p-8 md:p-10 transition-all duration-300">
+        <div className="bg-card dark:bg-card rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] border border-border p-8 md:p-10 transition-all duration-300">
           {/* Logo Integration */}
           <div className="flex justify-center mb-10">
             <div className="relative">
               <Image
                 src="https://i.ibb.co/rfKvSNKL/1000128270-1.png"
                 alt="NexaMart" 
-                width={300}
-                height={80}
-                className="mx-auto object-contain drop-shadow-md"
+                width={220}
+                height={60}
+                className="mx-auto object-contain drop-shadow-md dark:invert"
                 priority
                 unoptimized
               />
@@ -70,10 +70,10 @@ export default function LoginPage() {
           </div>
 
           <div className="text-center space-y-2 mb-8">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
+            <h1 className="text-2xl font-bold text-foreground tracking-tight">
               Welcome to NexaMart
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 text-sm font-medium leading-relaxed max-w-[280px] mx-auto">
+            <p className="text-muted-foreground text-sm font-medium leading-relaxed max-w-[280px] mx-auto">
               Discover every product in your local area, instantly.
             </p>
           </div>
@@ -82,7 +82,7 @@ export default function LoginPage() {
           <button
             onClick={handleGoogleSignIn}
             disabled={isSigningIn}
-            className="w-full flex items-center justify-center gap-3 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 font-semibold border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-3.5 transition-all duration-200 active:scale-[0.98] disabled:opacity-70 shadow-sm"
+            className="w-full flex items-center justify-center gap-3 bg-white dark:bg-black hover:bg-muted dark:hover:bg-muted text-gray-700 dark:text-gray-200 font-semibold border border-border rounded-xl px-4 py-3.5 transition-all duration-200 active:scale-[0.98] disabled:opacity-70 shadow-sm"
           >
             {isSigningIn ? (
               <Spinner className="h-5 w-5" />
@@ -112,17 +112,17 @@ export default function LoginPage() {
           </button>
 
           {/* Hyperlocal Business Badges */}
-          <div className="mt-10 pt-8 border-t border-gray-100 dark:border-gray-800">
+          <div className="mt-10 pt-8 border-t border-border">
             <div className="flex flex-wrap justify-center gap-y-4 gap-x-6">
-              <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+              <div className="flex items-center gap-2 text-muted-foreground">
                 <MapPin className="w-4 h-4 text-primary" />
                 <span className="text-[13px] font-semibold">Local Availability</span>
               </div>
-              <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+              <div className="flex items-center gap-2 text-muted-foreground">
                 <ShoppingBag className="w-4 h-4 text-primary" />
                 <span className="text-[13px] font-semibold">A to Z Products</span>
               </div>
-              <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+              <div className="flex items-center gap-2 text-muted-foreground">
                 <Search className="w-4 h-4 text-primary" />
                 <span className="text-[13px] font-semibold">Easy Discovery</span>
               </div>
@@ -131,19 +131,19 @@ export default function LoginPage() {
 
           {/* Policies Section */}
           <div className="mt-10 text-center space-y-3">
-            <div className="flex items-center justify-center gap-2 text-gray-400 dark:text-gray-500 mb-2">
+            <div className="flex items-center justify-center gap-2 text-muted-foreground mb-2">
               <ShieldCheck className="w-3.5 h-3.5" />
               <span className="text-[11px] uppercase tracking-widest font-bold">Secure Access</span>
             </div>
             <div className="flex justify-center gap-4 text-[12px] font-semibold">
-              <a href="#" className="text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition-colors underline-offset-4 hover:underline">Terms of Service</a>
-              <span className="text-gray-300 dark:text-gray-700 select-none">•</span>
-              <a href="#" className="text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition-colors underline-offset-4 hover:underline">Privacy Policy</a>
+              <a href="#" className="text-muted-foreground hover:text-primary transition-colors underline-offset-4 hover:underline">Terms of Service</a>
+              <span className="text-muted-foreground select-none">•</span>
+              <a href="#" className="text-muted-foreground hover:text-primary transition-colors underline-offset-4 hover:underline">Privacy Policy</a>
             </div>
           </div>
         </div>
         
-        <p className="mt-8 text-center text-gray-400 dark:text-gray-600 text-xs font-medium">
+        <p className="mt-8 text-center text-muted-foreground text-xs font-medium">
           © {new Date().getFullYear()} NexaMart Platforms Inc. All rights reserved.
         </p>
       </motion.div>

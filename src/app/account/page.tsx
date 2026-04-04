@@ -19,7 +19,8 @@ import {
   Home,
   Grid,
   Play,
-  UserCircle
+  UserCircle,
+  Moon
 } from "lucide-react";
 import { useAuthContext } from "@/components/auth-provider";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -50,16 +51,26 @@ export default function AccountPage() {
     router.push("/");
   };
 
-  const AccountItem = ({ icon: Icon, label, href = "#" }: { icon: any, label: string, href?: string }) => (
-    <Link href={href} className="flex items-center justify-between py-4 group active:bg-muted/50 transition-colors">
-      <div className="flex items-center gap-4">
+  const AccountItem = ({ 
+    icon: Icon, 
+    label, 
+    href = "#", 
+    action 
+  }: { 
+    icon: any, 
+    label: string, 
+    href?: string,
+    action?: React.ReactNode
+  }) => (
+    <div className="flex items-center justify-between py-4 group active:bg-muted/50 transition-colors">
+      <Link href={href} className="flex items-center gap-4 flex-1">
         <div className="text-muted-foreground group-hover:text-primary transition-colors">
           <Icon className="w-5 h-5" />
         </div>
         <span className="text-sm font-medium text-foreground">{label}</span>
-      </div>
-      <ChevronRight className="w-4 h-4 text-muted-foreground/30" />
-    </Link>
+      </Link>
+      {action ? action : <ChevronRight className="w-4 h-4 text-muted-foreground/30" />}
+    </div>
   );
 
   return (
@@ -67,7 +78,6 @@ export default function AccountPage() {
       {/* Header */}
       <div className="bg-background border-b border-border sticky top-0 z-50 px-4 h-14 flex items-center justify-between">
         <h1 className="text-lg font-bold text-foreground">My Account</h1>
-        <ThemeToggle />
       </div>
 
       <main className="max-w-md mx-auto">
@@ -99,6 +109,12 @@ export default function AccountPage() {
           <h3 className="text-[11px] font-black text-muted-foreground uppercase tracking-widest pt-4 pb-2">Account Settings</h3>
           <div className="flex flex-col">
             <AccountItem icon={User} label="Edit Profile" />
+            <Separator className="bg-border" />
+            <AccountItem 
+              icon={Moon} 
+              label="Dark Mode" 
+              action={<ThemeToggle />}
+            />
             <Separator className="bg-border" />
             <AccountItem icon={MapPin} label="Saved Local Areas / Addresses" />
             <Separator className="bg-border" />
