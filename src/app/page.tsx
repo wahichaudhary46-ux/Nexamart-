@@ -80,7 +80,7 @@ export default function StorefrontPage() {
           <div className="flex items-center gap-2 text-sm text-gray-600 font-semibold truncate">
             <MapPin className="w-4 h-4 text-primary shrink-0" />
             <span className="truncate">
-              Discovering in <span className="text-primary font-black underline decoration-2 underline-offset-4">South Delhi, India</span>
+              Location: <span className="text-primary font-black underline decoration-2 underline-offset-4">South Delhi, India</span>
             </span>
           </div>
           <Button 
