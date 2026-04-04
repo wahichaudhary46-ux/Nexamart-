@@ -39,12 +39,13 @@ export default function StorefrontPage() {
           
           {/* Row 1: Big Logo (Full width centered) */}
           <Link href="/" className="flex-shrink-0 w-full flex justify-center">
-            <div className="relative w-[280px] h-[70px] md:w-[450px] md:h-[120px]">
+            <div className="w-full max-w-[1500px]">
               <Image
                 src="https://i.ibb.co/rfKvSNKL/1000128270-1.png"
                 alt="NexaMart"
-                fill
-                className="object-contain dark:invert"
+                width={1500}
+                height={60}
+                className="w-full h-auto object-contain dark:invert"
                 priority
                 unoptimized
               />
