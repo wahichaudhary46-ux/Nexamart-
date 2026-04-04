@@ -39,7 +39,7 @@ export default function StorefrontPage() {
           
           {/* Row 1: Neatly sized logo centered */}
           <Link href="/" className="flex-shrink-0 flex justify-center">
-            <div className="relative w-32 md:w-48 h-10">
+            <div className="relative w-32 md:w-40 h-10">
               <Image
                 src="https://i.ibb.co/rfKvSNKL/1000128270-1.png"
                 alt="NexaMart"
