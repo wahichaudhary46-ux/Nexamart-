@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useAuthContext } from "@/components/auth-provider";
-import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import {
   DropdownMenu,
@@ -22,6 +21,7 @@ import {
 import { personalizedProductRecommendations } from "@/ai/flows/personalized-product-recommendations-flow";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
 
 const categories = [
   { name: "Electronics", icon: Laptop, count: 1240 },
@@ -67,9 +67,8 @@ export default function DashboardPage() {
           setRecommendations(res.recommendations || []);
         } catch (error: any) {
           setAiError(true);
-          if (!error.message?.includes('503')) {
-            console.error("AI Recommendation error:", error);
-          }
+          // 429 errors are handled in the flow with retries, 
+          // but we still catch failures here to update the UI
         } finally {
           setLoadingAI(false);
         }
@@ -94,16 +93,16 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-border bg-white/80 backdrop-blur-md">
+      <header className="sticky top-0 z-50 border-b border-border bg-white/80 dark:bg-gray-900/80 backdrop-blur-md transition-colors duration-300">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center">
             <Image
-              src="https://kommodo.ai/i/JOcih1ioLO78eqWEtcdO"
+              src="/logo.png"
               alt="NexaMart"
               width={140}
               height={40}
               className="object-contain"
-              unoptimized
+              priority
             />
           </div>
 
@@ -114,7 +113,7 @@ export default function DashboardPage() {
               <input
                 type="text"
                 placeholder="Search products, brands..."
-                className="w-full h-11 pl-10 pr-4 rounded-2xl border border-border bg-muted/30 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all shadow-sm"
+                className="w-full h-11 pl-10 pr-4 rounded-2xl border border-border bg-muted/30 dark:bg-gray-800 focus:bg-white dark:focus:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all shadow-sm"
               />
             </div>
           </div>
@@ -202,9 +201,9 @@ export default function DashboardPage() {
             {categories.map((category) => (
               <div
                 key={category.name}
-                className="group p-8 rounded-[2rem] border border-border bg-white hover:border-primary/20 hover:shadow-2xl transition-all duration-500 cursor-pointer text-center flex flex-col items-center"
+                className="group p-8 rounded-[2rem] border border-border bg-white dark:bg-gray-900 hover:border-primary/20 hover:shadow-2xl transition-all duration-500 cursor-pointer text-center flex flex-col items-center"
               >
-                <div className="w-16 h-16 rounded-2xl bg-muted/50 flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-white transition-all duration-500 shadow-sm group-hover:rotate-12">
+                <div className="w-16 h-16 rounded-2xl bg-muted/50 dark:bg-gray-800 flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-white transition-all duration-500 shadow-sm group-hover:rotate-12">
                   <category.icon className="w-8 h-8" />
                 </div>
                 <h3 className="font-bold text-foreground text-lg mb-1 group-hover:text-primary transition-colors">
@@ -246,7 +245,7 @@ export default function DashboardPage() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
               {recommendations.map((item) => (
-                <div key={item.id} className="bg-white rounded-3xl p-4 shadow-sm hover:shadow-md transition-all border border-border group cursor-pointer overflow-hidden">
+                <div key={item.id} className="bg-white dark:bg-gray-900 rounded-3xl p-4 shadow-sm hover:shadow-md transition-all border border-border group cursor-pointer overflow-hidden">
                   <div className="aspect-square relative mb-4 rounded-2xl overflow-hidden bg-muted">
                     <Image src={item.imageUrl} alt={item.name} fill className="object-cover group-hover:scale-110 transition-transform duration-500" />
                   </div>
@@ -274,7 +273,7 @@ export default function DashboardPage() {
               return (
                 <div
                   key={product.id}
-                  className="group rounded-[2.5rem] border border-border bg-white overflow-hidden hover:shadow-2xl transition-all duration-500 cursor-pointer"
+                  className="group rounded-[2.5rem] border border-border bg-white dark:bg-gray-900 overflow-hidden hover:shadow-2xl transition-all duration-500 cursor-pointer"
                 >
                   <div className="aspect-[4/5] relative overflow-hidden bg-muted">
                     <Image
@@ -306,7 +305,7 @@ export default function DashboardPage() {
                           <Star key={i} className={`w-3.5 h-3.5 ${i < Math.floor(product.rating) ? "text-accent fill-accent" : "text-muted"}`} />
                         ))}
                       </div>
-                      <span className="text-xs font-bold text-muted-foreground ml-1">{product.rating}</span>
+                      <span className="text-xs font-bold text-muted-foreground dark:text-gray-400 ml-1">{product.rating}</span>
                     </div>
                     <div className="flex items-center gap-3 pt-1">
                       <span className="text-xl font-extrabold text-foreground">

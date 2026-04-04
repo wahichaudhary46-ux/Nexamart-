@@ -63,52 +63,52 @@ export default function OnboardingPage() {
   if (loading || !user) return <LoadingSpinner />;
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-slate-50 dark:bg-gray-950 flex items-center justify-center px-4 py-12 transition-colors duration-300">
       <div className="absolute inset-0 opacity-[0.02] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]" />
       
       <motion.div
         initial={{ opacity: 0, scale: 0.98 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.4 }}
-        className="w-full max-w-md"
+        className="w-full max-w-md z-10"
       >
-        <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-200 p-8 md:p-10">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-200 dark:border-gray-800 p-8 md:p-10 transition-all duration-300">
           <div className="flex justify-center mb-8">
             <Image
-              src="https://kommodo.ai/i/JOcih1ioLO78eqWEtcdO"
+              src="/logo.png"
               alt="NexaMart"
               width={180}
               height={60}
               className="object-contain"
-              unoptimized
+              priority
             />
           </div>
 
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-slate-900">Complete your profile</h2>
-            <p className="text-slate-500 text-sm mt-1">Please provide your details to get started</p>
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Complete your profile</h2>
+            <p className="text-slate-500 dark:text-gray-400 text-sm mt-1">Please provide your details to get started</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-1.5">
-              <label className="text-sm font-semibold text-slate-700 ml-1">Full Name *</label>
+              <label className="text-sm font-semibold text-slate-700 dark:text-gray-300 ml-1">Full Name *</label>
               <Input
                 type="text"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="e.g. Akash Sharma"
                 required
-                className="h-12 rounded-xl border-slate-200 focus:ring-primary/20"
+                className="h-12 rounded-xl border-slate-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-primary/20"
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-semibold text-slate-700 ml-1">Phone Number (optional)</label>
+              <label className="text-sm font-semibold text-slate-700 dark:text-gray-300 ml-1">Phone Number (optional)</label>
               <Input
                 type="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="+91 98765 43210"
-                className="h-12 rounded-xl border-slate-200 focus:ring-primary/20"
+                className="h-12 rounded-xl border-slate-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:ring-primary/20"
               />
             </div>
             <Button
@@ -136,7 +136,7 @@ export default function OnboardingPage() {
 
 function LoadingSpinner() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50">
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-gray-950">
       <Spinner className="h-8 w-8 text-primary" />
     </div>
   );
