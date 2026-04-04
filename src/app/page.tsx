@@ -11,23 +11,14 @@ import {
   Grid,
   Play,
   UserCircle,
-  Bell
+  Bell,
+  ChevronRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useAuthContext } from "@/components/auth-provider";
 import { Card, CardContent } from "@/components/ui/card";
-
-const categories = [
-  { name: "Groceries", icon: "https://picsum.photos/seed/grocery/100/100", hint: "fresh vegetables" },
-  { name: "Electronics", icon: "https://picsum.photos/seed/elec/100/100", hint: "mobile phones" },
-  { name: "Fashion", icon: "https://picsum.photos/seed/fashion/100/100", hint: "clothing apparel" },
-  { name: "Home", icon: "https://picsum.photos/seed/home/100/100", hint: "furniture decor" },
-  { name: "Appliances", icon: "https://picsum.photos/seed/app/100/100", hint: "washing machine" },
-  { name: "Toys", icon: "https://picsum.photos/seed/toys/100/100", hint: "kids toys" },
-  { name: "Beauty", icon: "https://picsum.photos/seed/beauty/100/100", hint: "cosmetics makeup" },
-];
 
 const products = [
   { id: 1, name: "Wireless Pro Earbuds", price: "₹1,999", oldPrice: "₹3,999", rating: 4.5, shop: "Grover Electronics", img: "https://picsum.photos/seed/p1/400/400" },
@@ -83,29 +74,28 @@ export default function StorefrontPage() {
         </div>
       </header>
 
-      <main className="flex-1 w-full max-w-7xl mx-auto px-4 py-6 space-y-8">
-        {/* Category Strip */}
-        <section>
-          <div className="flex items-center gap-8 overflow-x-auto pb-4 scrollbar-hide no-scrollbar">
-            {categories.map((cat) => (
-              <div key={cat.name} className="flex flex-col items-center gap-2 flex-shrink-0 cursor-pointer group">
-                <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-white border border-gray-100 shadow-sm overflow-hidden p-1 transition-transform group-hover:scale-110">
-                  <div className="relative w-full h-full rounded-full overflow-hidden">
-                    <Image 
-                      src={cat.icon} 
-                      alt={cat.name} 
-                      fill 
-                      className="object-cover" 
-                      data-ai-hint={cat.hint}
-                    />
-                  </div>
-                </div>
-                <span className="text-[11px] md:text-xs font-bold text-gray-600 uppercase tracking-tight">{cat.name}</span>
-              </div>
-            ))}
+      {/* Styled Location Bar - Moved below Navbar */}
+      <div className="bg-gray-50 border-b border-gray-100 py-2.5">
+        <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
+          <div className="flex items-center gap-2 text-sm text-gray-600 font-semibold truncate">
+            <MapPin className="w-4 h-4 text-primary shrink-0" />
+            <span className="truncate">
+              Discovering in <span className="text-primary font-black underline decoration-2 underline-offset-4">South Delhi, India</span>
+            </span>
           </div>
-        </section>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="text-xs font-bold text-primary hover:bg-primary/5 flex items-center gap-1 shrink-0"
+          >
+            Change <span className="hidden sm:inline">Location</span>
+            <ChevronRight className="w-3 h-3" />
+          </Button>
+        </div>
+      </div>
 
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 py-6 space-y-8">
+        
         {/* Hero Banner Section */}
         <section className="relative w-full h-44 md:h-96 rounded-3xl overflow-hidden shadow-sm">
           <Image 
@@ -123,15 +113,6 @@ export default function StorefrontPage() {
             <Button className="w-fit bg-white text-primary hover:bg-gray-100 font-black px-10 h-12 md:h-14 rounded-full transition-all">Explore Stores</Button>
           </div>
         </section>
-
-        {/* Location & Discovery Tag */}
-        <div className="flex items-center justify-between py-2 border-y border-gray-50">
-          <div className="flex items-center gap-2 text-sm text-gray-500 font-semibold">
-            <MapPin className="w-4 h-4 text-primary" />
-            <span>Discovering in <span className="text-primary font-black underline decoration-2 underline-offset-4">South Delhi, India</span></span>
-          </div>
-          <Button variant="ghost" size="sm" className="text-xs font-bold text-gray-400">Change Location</Button>
-        </div>
 
         {/* Product Grid - Discovery Focused */}
         <section className="space-y-6">
@@ -257,7 +238,7 @@ export default function StorefrontPage() {
 
       {/* Mobile Bottom Navigation - Discovery Updated */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 flex items-center justify-around h-20 z-50 px-2 pb-2 shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
-        <Link href="/" className="flex flex-col items-center gap-1.5 text-gray-400 hover:text-primary transition-colors">
+        <Link href="/" className="flex flex-col items-center gap-1.5 text-primary">
           <Home className="w-5 h-5" />
           <span className="text-[10px] font-black uppercase tracking-tighter">Home</span>
         </Link>
