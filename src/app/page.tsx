@@ -37,22 +37,21 @@ export default function StorefrontPage() {
       <div className="bg-background border-b border-border transition-colors duration-300">
         <header className="max-w-7xl mx-auto px-4 pt-8 pb-4 flex flex-col items-center gap-6">
           
-          {/* Row 1: Big Logo (Full width centered) */}
-          <Link href="/" className="flex-shrink-0 w-full flex justify-center">
-            <div className="w-full max-w-[1500px]">
+          {/* Row 1: Neatly sized logo centered */}
+          <Link href="/" className="flex-shrink-0 flex justify-center">
+            <div className="relative w-32 md:w-48 h-10">
               <Image
                 src="https://i.ibb.co/rfKvSNKL/1000128270-1.png"
                 alt="NexaMart"
-                width={1500}
-                height={10}
-                className="w-full h-auto object-contain dark:invert"
+                fill
+                className="object-contain dark:invert"
                 priority
                 unoptimized
               />
             </div>
           </Link>
 
-          {/* Row 2: Search Bar + Notification Icon together */}
+          {/* Row 2: Search Bar + Notification Icon */}
           <div className="w-full max-w-4xl flex items-center gap-3">
             <div className="relative flex-grow group">
               <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
@@ -204,7 +203,7 @@ export default function StorefrontPage() {
       <footer className="hidden md:block bg-white dark:bg-black border-t border-border py-16 mt-16 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-12">
           <div className="space-y-6">
-             <div className="relative w-[180px] h-[50px]">
+             <div className="relative w-[120px] h-[30px]">
                <Image src="https://i.ibb.co/rfKvSNKL/1000128270-1.png" alt="NexaMart" fill className="object-contain dark:invert" unoptimized />
              </div>
              <p className="text-muted-foreground text-sm font-medium leading-relaxed">The ultimate discovery platform for local commerce. Find everything in your neighborhood instantly.</p>

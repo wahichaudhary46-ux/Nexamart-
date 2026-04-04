@@ -56,12 +56,11 @@ export default function LoginPage() {
         <div className="bg-card dark:bg-card rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] border border-border p-8 md:p-10 transition-all duration-300">
           {/* Logo Integration */}
           <div className="flex justify-center mb-10">
-            <div className="relative">
+            <div className="relative w-40 h-10">
               <Image
                 src="https://i.ibb.co/rfKvSNKL/1000128270-1.png"
                 alt="NexaMart" 
-                width={220}
-                height={10}
+                fill
                 className="mx-auto object-contain drop-shadow-md dark:invert"
                 priority
                 unoptimized
