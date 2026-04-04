@@ -6,9 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { 
   Search, 
-  User, 
   MapPin, 
-  ChevronRight,
   Home,
   Grid,
   Play,
@@ -40,14 +38,13 @@ const products = [
 ];
 
 export default function StorefrontPage() {
-  const { user, userProfile } = useAuthContext();
   const [searchQuery, setSearchQuery] = useState("");
 
   return (
     <div className="min-h-screen bg-white flex flex-col pb-20 md:pb-0 font-body">
       {/* Top Navbar - Clean & Discovery Focused */}
       <header className="bg-white sticky top-0 z-50 border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between md:grid md:grid-cols-3 gap-4">
           {/* Logo - Top Left */}
           <Link href="/" className="flex-shrink-0">
             <Image
@@ -61,29 +58,22 @@ export default function StorefrontPage() {
           </Link>
 
           {/* Centered Google-style Search Bar */}
-          <div className="flex-1 max-w-2xl hidden md:flex items-center relative group">
-            <div className="absolute left-5 text-gray-400">
-              <Search className="w-5 h-5" />
+          <div className="hidden md:flex items-center justify-center">
+            <div className="relative w-full max-w-2xl group">
+              <div className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400">
+                <Search className="w-5 h-5" />
+              </div>
+              <Input 
+                placeholder="Search local products, stores and more..." 
+                className="pl-12 h-12 w-full bg-white border border-gray-200 rounded-full shadow-sm hover:shadow-md transition-shadow focus-visible:ring-primary/20 text-base"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
             </div>
-            <Input 
-              placeholder="Search local products, stores and more..." 
-              className="pl-12 h-12 w-full bg-white border border-gray-200 rounded-full shadow-sm hover:shadow-md transition-shadow focus-visible:ring-primary/20 text-base"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
           </div>
 
-          {/* User Account - Top Right */}
-          <div className="flex items-center gap-2">
-            <Link href={user ? "/account" : "/login"}>
-              <Button variant="ghost" className="flex items-center gap-2 font-bold text-gray-700 hover:bg-gray-50 rounded-full px-4">
-                <User className="w-5 h-5" />
-                <span className="hidden sm:inline">
-                  {user ? (userProfile?.fullName?.split(' ')[0] || 'Account') : 'Sign In'}
-                </span>
-              </Button>
-            </Link>
-          </div>
+          {/* Spacer for Desktop Alignment / Symmetry */}
+          <div className="hidden md:block"></div>
         </div>
 
         {/* Mobile Search - Google Style */}
