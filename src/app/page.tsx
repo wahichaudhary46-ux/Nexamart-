@@ -17,7 +17,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { useAuthContext } from "@/components/auth-provider";
 import { Card, CardContent } from "@/components/ui/card";
 
 const products = [
@@ -34,9 +33,9 @@ export default function StorefrontPage() {
 
   return (
     <div className="min-h-screen bg-white flex flex-col pb-20 md:pb-0 font-body">
-      {/* Top Navbar - Streamlined Discovery Focused */}
-      <header className="bg-white sticky top-0 z-50 border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 h-16 md:h-20 flex flex-row items-center justify-between gap-4">
+      {/* Combined Top Header & Location Bar - Amazon Inspired */}
+      <div className="bg-gray-100 sticky top-0 z-50 border-b border-gray-200">
+        <header className="max-w-7xl mx-auto px-4 h-16 md:h-20 flex flex-row items-center justify-between gap-4">
           {/* Logo - Top Left */}
           <Link href="/" className="flex-shrink-0">
             <Image
@@ -71,12 +70,10 @@ export default function StorefrontPage() {
               <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white" />
             </Button>
           </div>
-        </div>
-      </header>
+        </header>
 
-      {/* Styled Location Bar - Moved below Navbar */}
-      <div className="bg-gray-50 border-b border-gray-100 py-2.5">
-        <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
+        {/* Location Bar */}
+        <div className="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm text-gray-600 font-semibold truncate">
             <MapPin className="w-4 h-4 text-primary shrink-0" />
             <span className="truncate">
@@ -94,109 +91,112 @@ export default function StorefrontPage() {
         </div>
       </div>
 
-      <main className="flex-1 w-full max-w-7xl mx-auto px-4 py-6 space-y-8">
-        
-        {/* Hero Banner Section */}
-        <section className="relative w-full h-44 md:h-96 rounded-3xl overflow-hidden shadow-sm">
-          <Image 
-            src="https://picsum.photos/seed/banner1/1200/400" 
-            alt="Discover Local" 
-            fill 
-            className="object-cover"
-            priority
-            data-ai-hint="shopping discount"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent flex flex-col justify-center px-8 md:px-20 text-white space-y-3 md:space-y-6">
-            <Badge className="w-fit bg-primary text-white font-bold px-3 py-1">HYPERLOCAL</Badge>
-            <h2 className="text-2xl md:text-6xl font-black leading-tight max-w-lg">FIND IT AT YOUR NEAREST STORE</h2>
-            <p className="text-sm md:text-xl font-medium opacity-90">Instant discovery of local inventory</p>
-            <Button className="w-fit bg-white text-primary hover:bg-gray-100 font-black px-10 h-12 md:h-14 rounded-full transition-all">Explore Stores</Button>
-          </div>
-        </section>
-
-        {/* Product Grid - Discovery Focused */}
-        <section className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-black text-gray-900 tracking-tight">Top Local Discoveries</h2>
-            <Button variant="link" className="text-primary font-bold">View More</Button>
-          </div>
+      {/* Main Content Area - Pure White */}
+      <main className="flex-1 w-full bg-white">
+        <div className="max-w-7xl mx-auto px-4 py-6 space-y-8">
           
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-            {products.map((product) => (
-              <Card key={product.id} className="group overflow-hidden border-none shadow-none hover:shadow-xl transition-all duration-300 rounded-2xl bg-white">
-                <CardContent className="p-0">
-                  <div className="relative aspect-square overflow-hidden bg-gray-50 rounded-2xl">
-                    <Image 
-                      src={product.img} 
-                      alt={product.name} 
-                      fill 
-                      className="object-cover transition-transform duration-500 group-hover:scale-105" 
-                      data-ai-hint="product image"
-                    />
-                    <Badge className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-primary font-black text-[10px] border-none px-2 shadow-sm">
-                      VERIFIED STOCK
-                    </Badge>
-                  </div>
-                  
-                  <div className="p-4 space-y-2">
-                    <div className="flex items-center gap-1.5 text-primary">
-                      <MapPin className="w-3.5 h-3.5" />
-                      <p className="text-xs font-black uppercase tracking-wider">
-                        Available at: <span className="text-gray-900 underline decoration-primary/30">{product.shop}</span>
-                      </p>
+          {/* Hero Banner Section */}
+          <section className="relative w-full h-44 md:h-96 rounded-3xl overflow-hidden shadow-sm">
+            <Image 
+              src="https://picsum.photos/seed/banner1/1200/400" 
+              alt="Discover Local" 
+              fill 
+              className="object-cover"
+              priority
+              data-ai-hint="shopping discount"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent flex flex-col justify-center px-8 md:px-20 text-white space-y-3 md:space-y-6">
+              <Badge className="w-fit bg-primary text-white font-bold px-3 py-1">HYPERLOCAL</Badge>
+              <h2 className="text-2xl md:text-6xl font-black leading-tight max-w-lg">FIND IT AT YOUR NEAREST STORE</h2>
+              <p className="text-sm md:text-xl font-medium opacity-90">Instant discovery of local inventory</p>
+              <Button className="w-fit bg-white text-primary hover:bg-gray-100 font-black px-10 h-12 md:h-14 rounded-full transition-all">Explore Stores</Button>
+            </div>
+          </section>
+
+          {/* Product Grid - Discovery Focused */}
+          <section className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-black text-gray-900 tracking-tight">Top Local Discoveries</h2>
+              <Button variant="link" className="text-primary font-bold">View More</Button>
+            </div>
+            
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+              {products.map((product) => (
+                <Card key={product.id} className="group overflow-hidden border-none shadow-none hover:shadow-xl transition-all duration-300 rounded-2xl bg-white">
+                  <CardContent className="p-0">
+                    <div className="relative aspect-square overflow-hidden bg-gray-50 rounded-2xl">
+                      <Image 
+                        src={product.img} 
+                        alt={product.name} 
+                        fill 
+                        className="object-cover transition-transform duration-500 group-hover:scale-105" 
+                        data-ai-hint="product image"
+                      />
+                      <Badge className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-primary font-black text-[10px] border-none px-2 shadow-sm">
+                        VERIFIED STOCK
+                      </Badge>
                     </div>
                     
-                    <h3 className="text-sm md:text-base font-bold text-gray-800 line-clamp-1 group-hover:text-primary transition-colors">
-                      {product.name}
-                    </h3>
-                    
-                    <div className="flex items-center gap-2">
-                      <div className="flex items-center bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded text-[10px] font-bold">
-                        ★ {product.rating}
+                    <div className="p-4 space-y-2">
+                      <div className="flex items-center gap-1.5 text-primary">
+                        <MapPin className="w-3.5 h-3.5" />
+                        <p className="text-xs font-black uppercase tracking-wider">
+                          Available at: <span className="text-gray-900 underline decoration-primary/30">{product.shop}</span>
+                        </p>
                       </div>
-                      <span className="text-[10px] text-gray-400 font-bold uppercase">100+ views today</span>
-                    </div>
-
-                    <div className="pt-2 flex items-center justify-between border-t border-gray-50 mt-2">
-                      <div className="flex flex-col">
-                        <span className="text-lg font-black text-gray-900 leading-tight">{product.price}</span>
-                        <span className="text-[10px] text-gray-400 line-through font-bold">{product.oldPrice}</span>
+                      
+                      <h3 className="text-sm md:text-base font-bold text-gray-800 line-clamp-1 group-hover:text-primary transition-colors">
+                        {product.name}
+                      </h3>
+                      
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded text-[10px] font-bold">
+                          ★ {product.rating}
+                        </div>
+                        <span className="text-[10px] text-gray-400 font-bold uppercase">100+ views today</span>
                       </div>
-                      <Button className="bg-primary hover:bg-primary/90 text-white font-black text-[10px] h-9 rounded-xl px-4 shadow-sm">
-                        Locate Store
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </section>
 
-        {/* Local Stores Promotion */}
-        <section className="bg-gray-900 rounded-[2.5rem] p-8 md:p-16 text-white overflow-hidden relative">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 blur-[100px] rounded-full" />
-          <div className="flex flex-col md:flex-row items-center gap-12 relative z-10">
-            <div className="flex-1 space-y-6 text-center md:text-left">
-              <h2 className="text-3xl md:text-5xl font-black">SUPPORT YOUR LOCAL SHOPKEEPERS</h2>
-              <p className="text-gray-400 text-lg font-medium max-w-xl">
-                NexMart connects you directly with the verified local businesses in your area. Discover deals, check availability, and shop local.
-              </p>
-              <div className="flex flex-wrap justify-center md:justify-start gap-4 pt-4">
-                <Button className="bg-primary hover:bg-primary/90 font-black rounded-full px-10 h-14">Find Shops Near Me</Button>
-                <Button variant="outline" className="border-white/20 text-white hover:bg-white/10 font-black rounded-full px-10 h-14">Partner with Us</Button>
+                      <div className="pt-2 flex items-center justify-between border-t border-gray-50 mt-2">
+                        <div className="flex flex-col">
+                          <span className="text-lg font-black text-gray-900 leading-tight">{product.price}</span>
+                          <span className="text-[10px] text-gray-400 line-through font-bold">{product.oldPrice}</span>
+                        </div>
+                        <Button className="bg-primary hover:bg-primary/90 text-white font-black text-[10px] h-9 rounded-xl px-4 shadow-sm">
+                          Locate Store
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </section>
+
+          {/* Local Shops Promotion */}
+          <section className="bg-gray-900 rounded-[2.5rem] p-8 md:p-16 text-white overflow-hidden relative">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 blur-[100px] rounded-full" />
+            <div className="flex flex-col md:flex-row items-center gap-12 relative z-10">
+              <div className="flex-1 space-y-6 text-center md:text-left">
+                <h2 className="text-3xl md:text-5xl font-black">SUPPORT YOUR LOCAL SHOPKEEPERS</h2>
+                <p className="text-gray-400 text-lg font-medium max-w-xl">
+                  NexMart connects you directly with the verified local businesses in your area. Discover deals, check availability, and shop local.
+                </p>
+                <div className="flex flex-wrap justify-center md:justify-start gap-4 pt-4">
+                  <Button className="bg-primary hover:bg-primary/90 font-black rounded-full px-10 h-14">Find Shops Near Me</Button>
+                  <Button variant="outline" className="border-white/20 text-white hover:bg-white/10 font-black rounded-full px-10 h-14">Partner with Us</Button>
+                </div>
+              </div>
+              <div className="flex gap-6">
+                <div className="relative w-40 h-56 md:w-56 md:h-72 rounded-3xl overflow-hidden shadow-2xl rotate-3">
+                    <Image src="https://picsum.photos/seed/t1/300/400" alt="Local Shop" fill className="object-cover" />
+                </div>
+                <div className="relative w-40 h-56 md:w-56 md:h-72 rounded-3xl overflow-hidden shadow-2xl -rotate-6 mt-8 hidden sm:block">
+                    <Image src="https://picsum.photos/seed/t2/300/400" alt="Local Inventory" fill className="object-cover" />
+                </div>
               </div>
             </div>
-            <div className="flex gap-6">
-               <div className="relative w-40 h-56 md:w-56 md:h-72 rounded-3xl overflow-hidden shadow-2xl rotate-3">
-                  <Image src="https://picsum.photos/seed/t1/300/400" alt="Local Shop" fill className="object-cover" />
-               </div>
-               <div className="relative w-40 h-56 md:w-56 md:h-72 rounded-3xl overflow-hidden shadow-2xl -rotate-6 mt-8 hidden sm:block">
-                  <Image src="https://picsum.photos/seed/t2/300/400" alt="Local Inventory" fill className="object-cover" />
-               </div>
-            </div>
-          </div>
-        </section>
+          </section>
+        </div>
       </main>
 
       {/* Desktop Footer - Minimal */}
@@ -236,7 +236,7 @@ export default function StorefrontPage() {
         </div>
       </footer>
 
-      {/* Mobile Bottom Navigation - Discovery Updated */}
+      {/* Mobile Bottom Navigation - White Background */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 flex items-center justify-around h-20 z-50 px-2 pb-2 shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
         <Link href="/" className="flex flex-col items-center gap-1.5 text-primary">
           <Home className="w-5 h-5" />
