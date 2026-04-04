@@ -85,8 +85,8 @@ export default function DashboardPage() {
               <Image
                 src="https://i.ibb.co/rfKvSNKL/1000128270-1.png"
                 alt="NexaMart"
-                width={140}
-                height={40}
+                width={160}
+                height={50}
                 className="object-contain"
                 unoptimized
               />
