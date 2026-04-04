@@ -10,7 +10,8 @@ import {
   Home,
   Grid,
   Play,
-  UserCircle
+  UserCircle,
+  Bell
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,50 +43,42 @@ export default function StorefrontPage() {
 
   return (
     <div className="min-h-screen bg-white flex flex-col pb-20 md:pb-0 font-body">
-      {/* Top Navbar - Clean & Discovery Focused */}
+      {/* Top Navbar - Streamlined Discovery Focused */}
       <header className="bg-white sticky top-0 z-50 border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between md:grid md:grid-cols-3 gap-4">
+        <div className="max-w-7xl mx-auto px-4 h-16 md:h-20 flex flex-row items-center justify-between gap-4">
           {/* Logo - Top Left */}
           <Link href="/" className="flex-shrink-0">
             <Image
               src="https://i.ibb.co/rfKvSNKL/1000128270-1.png"
               alt="NexaMart"
-              width={160}
-              height={46}
-              className="object-contain"
+              width={120}
+              height={36}
+              className="object-contain md:w-[160px] md:h-[46px]"
               unoptimized
             />
           </Link>
 
-          {/* Centered Google-style Search Bar */}
-          <div className="hidden md:flex items-center justify-center">
-            <div className="relative w-full max-w-2xl group">
-              <div className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400">
-                <Search className="w-5 h-5" />
+          {/* Flexible Google-style Search Bar */}
+          <div className="flex-grow flex items-center justify-center max-w-2xl">
+            <div className="relative w-full group">
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                <Search className="w-4 h-4" />
               </div>
               <Input 
-                placeholder="Search local products, stores and more..." 
-                className="pl-12 h-12 w-full bg-white border border-gray-200 rounded-full shadow-sm hover:shadow-md transition-shadow focus-visible:ring-primary/20 text-base"
+                placeholder="Search local products..." 
+                className="pl-10 h-10 md:h-12 w-full bg-white border border-gray-200 rounded-full shadow-sm hover:shadow-md transition-shadow focus-visible:ring-primary/20 text-sm"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
           </div>
 
-          {/* Spacer for Desktop Alignment / Symmetry */}
-          <div className="hidden md:block"></div>
-        </div>
-
-        {/* Mobile Search - Google Style */}
-        <div className="md:hidden px-4 pb-4 bg-white">
-          <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <Input 
-              placeholder="Search local products..." 
-              className="pl-10 h-11 bg-white border border-gray-200 rounded-full shadow-sm text-sm"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+          {/* Right Side - Notification Bell */}
+          <div className="flex-shrink-0">
+            <Button variant="ghost" size="icon" className="relative text-gray-500 hover:text-primary transition-colors">
+              <Bell className="w-5 h-5" />
+              <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white" />
+            </Button>
           </div>
         </div>
       </header>
