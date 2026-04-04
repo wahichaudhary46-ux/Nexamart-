@@ -123,8 +123,15 @@ export default function DashboardPage() {
       >
         <div className="p-6 flex items-center justify-between">
           {isSidebarOpen && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <Image src="https://i.ibb.co/rfKvSNKL/1000128270-1.png" alt="Logo" width={1500} height={15} className="dark:invert" unoptimized />
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex-1 overflow-hidden pr-4">
+              <Image 
+                src="https://i.ibb.co/rfKvSNKL/1000128270-1.png" 
+                alt="Logo" 
+                width={500} 
+                height={40} 
+                className="w-full h-auto object-contain dark:invert" 
+                unoptimized 
+              />
             </motion.div>
           )}
           <Button variant="ghost" size="icon" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
