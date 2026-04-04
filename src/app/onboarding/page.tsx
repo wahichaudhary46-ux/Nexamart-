@@ -75,12 +75,13 @@ export default function OnboardingPage() {
         <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-200 dark:border-gray-800 p-8 md:p-10 transition-all duration-300">
           <div className="flex justify-center mb-8">
             <Image
-              src="/logo.png"
+              src="https://i.ibb.co/rfKvSNKL/1000128270-1.png"
               alt="NexaMart"
-              width={180}
-              height={60}
-              className="object-contain"
+              width={1500}
+              height={10}
+              className="w-full h-auto object-contain dark:invert"
               priority
+              unoptimized
             />
           </div>
 

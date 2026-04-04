@@ -101,8 +101,10 @@ export default function DashboardPage() {
     );
   }
 
-  const NavItem = ({ icon: Icon, label, active = false }: { icon: any, label: string, active?: boolean }) => (
-    <button className={`
+  const NavItem = ({ icon: Icon, label, active = false, onClick }: { icon: any, label: string, active?: boolean, onClick?: () => void }) => (
+    <button 
+      onClick={onClick}
+      className={`
       w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200
       ${active ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}
     `}>
