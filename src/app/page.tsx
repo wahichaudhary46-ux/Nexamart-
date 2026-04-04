@@ -33,8 +33,8 @@ export default function StorefrontPage() {
 
   return (
     <div className="min-h-screen bg-white flex flex-col pb-20 md:pb-0 font-body">
-      {/* Combined Top Header & Location Bar - Normal Scrolling */}
-      <div className="bg-gray-100 border-b border-gray-200">
+      {/* Combined Top Header & Location Bar - White Theme */}
+      <div className="bg-white border-b border-gray-100">
         <header className="max-w-7xl mx-auto px-4 h-16 md:h-20 flex flex-row items-center justify-between gap-4">
           {/* Logo - Top Left */}
           <Link href="/" className="flex-shrink-0">
@@ -56,7 +56,7 @@ export default function StorefrontPage() {
               </div>
               <Input 
                 placeholder="Search local products..." 
-                className="pl-10 h-10 md:h-12 w-full bg-white border border-gray-200 rounded-full shadow-sm hover:shadow-md transition-shadow focus-visible:ring-primary/20 text-sm"
+                className="pl-10 h-10 md:h-12 w-full bg-gray-50 border border-gray-100 rounded-full shadow-sm hover:shadow-md transition-shadow focus-visible:ring-primary/20 text-sm"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -73,7 +73,7 @@ export default function StorefrontPage() {
         </header>
 
         {/* Location Bar */}
-        <div className="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between border-t border-gray-50">
           <div className="flex items-center gap-2 text-sm text-gray-600 font-semibold truncate">
             <MapPin className="w-4 h-4 text-primary shrink-0" />
             <span className="truncate">
