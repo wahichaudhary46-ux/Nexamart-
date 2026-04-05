@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { 
@@ -15,7 +15,6 @@ import {
   ChevronRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -30,10 +29,39 @@ const products = [
 
 export default function StorefrontPage() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [locationName, setLocationName] = useState("Detecting...");
+
+  useEffect(() => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          try {
+            const { latitude, longitude } = position.coords;
+            // Using Nominatim for free reverse geocoding
+            const res = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+            );
+            const data = await res.json();
+            const city = data.address.city || data.address.town || data.address.village || data.address.suburb || data.address.state_district || "Kolkata, India";
+            setLocationName(`${city}, India`);
+          } catch (error) {
+            console.error("Reverse geocoding failed:", error);
+            setLocationName("Select Location");
+          }
+        },
+        (error) => {
+          console.error("Geolocation error:", error);
+          setLocationName("Select Location");
+        }
+      );
+    } else {
+      setLocationName("Select Location");
+    }
+  }, []);
 
   return (
     <div className="min-h-screen bg-background flex flex-col pb-20 md:pb-0 font-body transition-colors duration-300">
-      {/* Top Navigation - Compact Single Row */}
+      {/* Top Navbar */}
       <div className="flex items-center justify-between gap-2 px-3 py-3 bg-slate-100 dark:bg-gray-900 w-full border-b border-border transition-colors duration-300">
         
         {/* 1. NexaMart Logo */}
@@ -63,7 +91,6 @@ export default function StorefrontPage() {
         <div className="flex-shrink-0">
           <button className="relative p-1 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-full transition-colors">
             <Bell className="h-6 w-6 text-gray-700 dark:text-gray-300" />
-            {/* Red badge for notification */}
             <span className="absolute top-0 right-1 block h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-slate-100 dark:ring-gray-900"></span>
           </button>
         </div>
@@ -75,7 +102,7 @@ export default function StorefrontPage() {
           <div className="flex items-center gap-2 text-sm text-muted-foreground font-semibold truncate">
             <MapPin className="w-4 h-4 text-primary shrink-0" />
             <span className="truncate">
-              Location: <span className="text-primary font-black underline decoration-2 underline-offset-4">South Delhi, India</span>
+              Location: <span className="text-primary font-black underline decoration-2 underline-offset-4">{locationName}</span>
             </span>
           </div>
           <Button 
@@ -105,13 +132,13 @@ export default function StorefrontPage() {
             />
             <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent flex flex-col justify-center px-8 md:px-20 text-white space-y-3 md:space-y-6">
               <Badge className="w-fit bg-primary text-white font-bold px-3 py-1 border-none">HYPERLOCAL</Badge>
-              <h2 className="text-2xl md:text-6xl font-black leading-tight max-w-lg">FIND IT AT YOUR NEAREST STORE</h2>
+              <h2 className="text-2xl md:text-6xl font-black leading-tight max-w-lg uppercase">Find it at your nearest store</h2>
               <p className="text-sm md:text-xl font-medium opacity-90">Instant discovery of local inventory</p>
               <Button className="w-fit bg-white text-primary hover:bg-gray-100 font-black px-10 h-12 md:h-14 rounded-full transition-all">Explore Stores</Button>
             </div>
           </section>
 
-          {/* Product Grid - Discovery Focused */}
+          {/* Product Grid */}
           <section className="space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-black text-foreground tracking-tight">Top Local Discoveries</h2>
@@ -175,9 +202,9 @@ export default function StorefrontPage() {
             <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 blur-[100px] rounded-full" />
             <div className="flex flex-col md:flex-row items-center gap-12 relative z-10">
               <div className="flex-1 space-y-6 text-center md:text-left">
-                <h2 className="text-3xl md:text-5xl font-black">SUPPORT YOUR LOCAL SHOPKEEPERS</h2>
+                <h2 className="text-3xl md:text-5xl font-black uppercase">Support Your Local Shopkeepers</h2>
                 <p className="text-gray-400 dark:text-muted-foreground text-lg font-medium max-w-xl">
-                  NexMart connects you directly with the verified local businesses in your area. Discover deals, check availability, and shop local.
+                  NexaMart connects you directly with verified local businesses. Discover deals, check availability, and shop local.
                 </p>
                 <div className="flex flex-wrap justify-center md:justify-start gap-4 pt-4">
                   <Button className="bg-primary hover:bg-primary/90 font-black rounded-full px-10 h-14 border-none">Find Shops Near Me</Button>
@@ -197,7 +224,7 @@ export default function StorefrontPage() {
         </div>
       </main>
 
-      {/* Desktop Footer - Minimal */}
+      {/* Desktop Footer */}
       <footer className="hidden md:block bg-white dark:bg-black border-t border-border py-16 mt-16 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-12">
           <div className="space-y-6">
