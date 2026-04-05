@@ -42,8 +42,13 @@ export default function StorefrontPage() {
               `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
             );
             const data = await res.json();
-            const city = data.address.city || data.address.town || data.address.village || data.address.suburb || data.address.state_district || "Kolkata, India";
-            setLocationName(`${city}, India`);
+            const addr = data.address;
+            
+            // Extract city/area and postcode
+            const city = addr.city || addr.town || addr.village || addr.suburb || addr.state_district || "Kolkata";
+            const pinCode = addr.postcode ? ` - ${addr.postcode}` : "";
+            
+            setLocationName(`${city}${pinCode}, India`);
           } catch (error) {
             console.error("Reverse geocoding failed:", error);
             setLocationName("Select Location");
@@ -61,7 +66,7 @@ export default function StorefrontPage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col pb-20 md:pb-0 font-body transition-colors duration-300">
-      {/* Top Navbar */}
+      {/* Top Navbar - Compact Single Row */}
       <div className="flex items-center justify-between gap-2 px-3 py-3 bg-slate-100 dark:bg-gray-900 w-full border-b border-border transition-colors duration-300">
         
         {/* 1. NexaMart Logo */}
@@ -73,7 +78,7 @@ export default function StorefrontPage() {
           </Link>
         </div>
 
-        {/* 2. Search Bar */}
+        {/* 2. Search Bar - Flexible Size */}
         <div className="flex-1 mx-2">
           <div className="relative">
             <input
