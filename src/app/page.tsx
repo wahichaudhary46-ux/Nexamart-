@@ -33,47 +33,45 @@ export default function StorefrontPage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col pb-20 md:pb-0 font-body transition-colors duration-300">
-      {/* Top Section: Header + Location Bar */}
-      <div className="bg-background border-b border-border transition-colors duration-300">
-        <header className="max-w-7xl mx-auto px-4 pt-8 pb-4 flex flex-col items-center gap-6">
-          
-          {/* Row 1: Neatly sized logo centered */}
-          <Link href="/" className="flex-shrink-0 flex justify-center">
-            <div className="relative w-32 md:w-40 h-10">
-              <Image
-                src="https://i.ibb.co/rfKvSNKL/1000128270-1.png"
-                alt="NexaMart"
-                fill
-                className="object-contain dark:invert"
-                priority
-                unoptimized
-              />
-            </div>
+      {/* Top Navigation - Compact Single Row */}
+      <div className="flex items-center justify-between gap-2 px-3 py-3 bg-slate-100 dark:bg-gray-900 w-full border-b border-border transition-colors duration-300">
+        
+        {/* 1. NexaMart Logo */}
+        <div className="flex-shrink-0">
+          <Link href="/">
+            <span className="text-xl md:text-2xl font-extrabold text-blue-700 dark:text-blue-400">
+              NexaMart
+            </span>
           </Link>
+        </div>
 
-          {/* Row 2: Search Bar + Notification Icon */}
-          <div className="w-full max-w-4xl flex items-center gap-3">
-            <div className="relative flex-grow group">
-              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
-                <Search className="w-5 h-5" />
-              </div>
-              <Input 
-                placeholder="Search local products..." 
-                className="pl-12 h-12 md:h-14 w-full bg-white dark:bg-gray-900 border border-border rounded-full shadow-sm hover:shadow-md transition-shadow focus-visible:ring-primary/20 text-base"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            
-            <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-primary transition-colors h-12 w-12 md:h-14 md:w-14 shrink-0 rounded-full bg-slate-50 dark:bg-gray-900 border border-border shadow-sm">
-              <Bell className="w-6 h-6 md:w-7 md:h-7" />
-              <span className="absolute top-3 right-3 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-background" />
-            </Button>
+        {/* 2. Search Bar */}
+        <div className="flex-1 mx-2">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search local products..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full h-10 pl-10 pr-3 rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm focus:outline-none focus:border-blue-500 transition-all"
+            />
+            <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
           </div>
-        </header>
+        </div>
 
-        {/* Location Bar */}
-        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between border-t border-border/50 bg-background">
+        {/* 3. Notification Icon */}
+        <div className="flex-shrink-0">
+          <button className="relative p-1 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-full transition-colors">
+            <Bell className="h-6 w-6 text-gray-700 dark:text-gray-300" />
+            {/* Red badge for notification */}
+            <span className="absolute top-0 right-1 block h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-slate-100 dark:ring-gray-900"></span>
+          </button>
+        </div>
+      </div>
+
+      {/* Location Bar */}
+      <div className="w-full bg-white dark:bg-black border-b border-border/50">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm text-muted-foreground font-semibold truncate">
             <MapPin className="w-4 h-4 text-primary shrink-0" />
             <span className="truncate">
@@ -203,8 +201,8 @@ export default function StorefrontPage() {
       <footer className="hidden md:block bg-white dark:bg-black border-t border-border py-16 mt-16 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-12">
           <div className="space-y-6">
-             <div className="relative w-[120px] h-[30px]">
-               <Image src="https://i.ibb.co/rfKvSNKL/1000128270-1.png" alt="NexaMart" fill className="object-contain dark:invert" unoptimized />
+             <div className="relative w-[120px] h-[30px] flex items-center">
+               <span className="text-2xl font-black text-blue-700 dark:text-blue-400">NexaMart</span>
              </div>
              <p className="text-muted-foreground text-sm font-medium leading-relaxed">The ultimate discovery platform for local commerce. Find everything in your neighborhood instantly.</p>
           </div>
