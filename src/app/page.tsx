@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { 
@@ -12,64 +12,92 @@ import {
   Play,
   UserCircle,
   Bell,
-  ChevronRight
+  ChevronRight,
+  Check
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
+// Expanded mock data with location info for Nawada District
 const products = [
-  { id: 1, name: "Wireless Pro Earbuds", price: "₹1,999", oldPrice: "₹3,999", rating: 4.5, shop: "Grover Electronics", img: "https://picsum.photos/seed/p1/400/400" },
-  { id: 2, name: "Cotton Blend Slim Fit Shirt", price: "₹899", oldPrice: "₹1,599", rating: 4.2, shop: "Fashion Hub", img: "https://picsum.photos/seed/p2/400/400" },
-  { id: 3, name: "Premium Basmati Rice 5kg", price: "₹549", oldPrice: "₹700", rating: 4.8, shop: "Daily Fresh", img: "https://picsum.photos/seed/p3/400/400" },
-  { id: 4, name: "Ergonomic Office Chair", price: "₹4,299", oldPrice: "₹8,000", rating: 4.4, shop: "Comfort Decor", img: "https://picsum.photos/seed/p4/400/400" },
-  { id: 5, name: "Smart Watch Series 7", price: "₹2,499", oldPrice: "₹5,999", rating: 4.6, shop: "Tech World", img: "https://picsum.photos/seed/p5/400/400" },
-  { id: 6, name: "Organic Honey 500g", price: "₹320", oldPrice: "₹450", rating: 4.9, shop: "Nature Mart", img: "https://picsum.photos/seed/p6/400/400" },
+  { id: 1, name: "Wireless Pro Earbuds", price: "₹1,999", oldPrice: "₹3,999", rating: 4.5, shop: "Grover Electronics", city: "Nawada City", location: "Main Market, Nawada", img: "https://picsum.photos/seed/p1/400/400" },
+  { id: 2, name: "Cotton Blend Slim Fit Shirt", price: "₹899", oldPrice: "₹1,599", rating: 4.2, shop: "Fashion Hub", city: "Hisua", location: "Station Road, Hisua", img: "https://picsum.photos/seed/p2/400/400" },
+  { id: 3, name: "Premium Basmati Rice 5kg", price: "₹549", oldPrice: "₹700", rating: 4.8, shop: "Daily Fresh", city: "Nardiganj", location: "Main Road, Nardiganj", img: "https://picsum.photos/seed/p3/400/400" },
+  { id: 4, name: "Ergonomic Office Chair", price: "₹4,299", oldPrice: "₹8,000", rating: 4.4, shop: "Comfort Decor", city: "Warsaliganj", location: "Cinema Hall Road", img: "https://picsum.photos/seed/p4/400/400" },
+  { id: 5, name: "Smart Watch Series 7", price: "₹2,499", oldPrice: "₹5,999", rating: 4.6, shop: "Tech World", city: "Nawada City", location: "Hospital Road, Nawada", img: "https://picsum.photos/seed/p5/400/400" },
+  { id: 6, name: "Organic Honey 500g", price: "₹320", oldPrice: "₹450", rating: 4.9, shop: "Nature Mart", city: "Rajauli", location: "Bus Stand Road", img: "https://picsum.photos/seed/p6/400/400" },
+  { id: 7, name: "Deepak Mustard Oil 1L", price: "₹165", oldPrice: "₹185", rating: 4.7, shop: "Gupta Kirana Store", city: "Nardiganj", location: "Old Bazar, Nardiganj", img: "https://picsum.photos/seed/p7/400/400" },
+  { id: 8, name: "LED Smart TV 32\"", price: "₹12,499", oldPrice: "₹18,000", rating: 4.3, shop: "Nawada Digital", city: "Nawada City", location: "Prajatantra Dwar", img: "https://picsum.photos/seed/p8/400/400" },
+];
+
+const NAWADA_CITIES = [
+  "Nawada City",
+  "Nardiganj",
+  "Hisua",
+  "Warsaliganj",
+  "Rajauli",
+  "Akbarpur",
+  "Meskaur",
+  "Pakribarwan"
 ];
 
 export default function StorefrontPage() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [locationName, setLocationName] = useState("Detecting...");
+  const [selectedCity, setSelectedCity] = useState("Detecting...");
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
+  // Auto-detect location on mount
   useEffect(() => {
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           try {
             const { latitude, longitude } = position.coords;
-            // Using Nominatim for free reverse geocoding
             const res = await fetch(
               `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
             );
             const data = await res.json();
             const addr = data.address;
-            
-            // Extract city/area and postcode
-            const city = addr.city || addr.town || addr.village || addr.suburb || addr.state_district || "Kolkata";
-            const pinCode = addr.postcode ? ` - ${addr.postcode}` : "";
-            
-            setLocationName(`${city}${pinCode}, India`);
+            const city = addr.city || addr.town || addr.village || addr.suburb || addr.state_district || "Nawada City";
+            setSelectedCity(city);
           } catch (error) {
             console.error("Reverse geocoding failed:", error);
-            setLocationName("Select Location");
+            setSelectedCity("Nawada City");
           }
         },
         (error) => {
           console.error("Geolocation error:", error);
-          setLocationName("Select Location");
+          setSelectedCity("Nawada City");
         }
       );
     } else {
-      setLocationName("Select Location");
+      setSelectedCity("Nawada City");
     }
   }, []);
 
+  // Filtering logic for Discovery
+  const filteredProducts = useMemo(() => {
+    return products.filter(product => {
+      const matchesCity = selectedCity === "Detecting..." || product.city === selectedCity;
+      const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                           product.shop.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesCity && matchesSearch;
+    });
+  }, [selectedCity, searchQuery]);
+
   return (
     <div className="min-h-screen bg-background flex flex-col pb-20 md:pb-0 font-body transition-colors duration-300">
+      
       {/* Top Navbar - Compact Single Row */}
       <div className="flex items-center justify-between gap-2 px-3 py-3 bg-slate-100 dark:bg-gray-900 w-full border-b border-border transition-colors duration-300">
-        
-        {/* 1. NexaMart Logo */}
         <div className="flex-shrink-0">
           <Link href="/">
             <span className="text-xl md:text-2xl font-extrabold text-blue-700 dark:text-blue-400">
@@ -78,12 +106,11 @@ export default function StorefrontPage() {
           </Link>
         </div>
 
-        {/* 2. Search Bar - Flexible Size */}
         <div className="flex-1 mx-2">
           <div className="relative">
             <input
               type="text"
-              placeholder="Search local products..."
+              placeholder={`Search products in ${selectedCity}...`}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full h-10 pl-10 pr-3 rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm focus:outline-none focus:border-blue-500 transition-all"
@@ -92,7 +119,6 @@ export default function StorefrontPage() {
           </div>
         </div>
 
-        {/* 3. Notification Icon */}
         <div className="flex-shrink-0">
           <button className="relative p-1 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-full transition-colors">
             <Bell className="h-6 w-6 text-gray-700 dark:text-gray-300" />
@@ -101,23 +127,58 @@ export default function StorefrontPage() {
         </div>
       </div>
 
-      {/* Location Bar */}
+      {/* Location Bar with functional Selection Drawer */}
       <div className="w-full bg-white dark:bg-black border-b border-border/50">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm text-muted-foreground font-semibold truncate">
             <MapPin className="w-4 h-4 text-primary shrink-0" />
             <span className="truncate">
-              Location: <span className="text-primary font-black underline decoration-2 underline-offset-4">{locationName}</span>
+              Discovery in: <span className="text-primary font-black underline decoration-2 underline-offset-4">{selectedCity}</span>
             </span>
           </div>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="text-xs font-bold text-primary hover:bg-primary/5 flex items-center gap-1 shrink-0"
-          >
-            Change <span className="hidden sm:inline">Location</span>
-            <ChevronRight className="w-3 h-3" />
-          </Button>
+          
+          <Sheet open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+            <SheetTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-xs font-bold text-primary hover:bg-primary/5 flex items-center gap-1 shrink-0"
+              >
+                Change Area
+                <ChevronRight className="w-3 h-3" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="bottom" className="rounded-t-[2rem] h-[60vh] p-0 overflow-hidden">
+              <SheetHeader className="p-6 border-b border-border">
+                <SheetTitle className="text-xl font-black text-center">Select Your Area</SheetTitle>
+                <p className="text-center text-sm text-muted-foreground font-medium">Find shops and products near you in Nawada District</p>
+              </SheetHeader>
+              <div className="overflow-y-auto h-full pb-20 p-4">
+                <div className="grid gap-2">
+                  {NAWADA_CITIES.map((city) => (
+                    <button
+                      key={city}
+                      onClick={() => {
+                        setSelectedCity(city);
+                        setIsDrawerOpen(false);
+                      }}
+                      className={`flex items-center justify-between p-4 rounded-2xl transition-all ${
+                        selectedCity === city 
+                          ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20" 
+                          : "bg-muted/50 hover:bg-muted text-foreground"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <MapPin className={`w-5 h-5 ${selectedCity === city ? "text-primary-foreground" : "text-primary"}`} />
+                        <span className="font-bold">{city}</span>
+                      </div>
+                      {selectedCity === city && <Check className="w-5 h-5" />}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
 
@@ -136,70 +197,94 @@ export default function StorefrontPage() {
               data-ai-hint="shopping discount"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent flex flex-col justify-center px-8 md:px-20 text-white space-y-3 md:space-y-6">
-              <Badge className="w-fit bg-primary text-white font-bold px-3 py-1 border-none">HYPERLOCAL</Badge>
-              <h2 className="text-2xl md:text-6xl font-black leading-tight max-w-lg uppercase">Find it at your nearest store</h2>
+              <Badge className="w-fit bg-primary text-white font-bold px-3 py-1 border-none">NAWADA DISTRICT</Badge>
+              <h2 className="text-2xl md:text-6xl font-black leading-tight max-w-lg uppercase">Hyperlocal shopping in {selectedCity}</h2>
               <p className="text-sm md:text-xl font-medium opacity-90">Instant discovery of local inventory</p>
               <Button className="w-fit bg-white text-primary hover:bg-gray-100 font-black px-10 h-12 md:h-14 rounded-full transition-all">Explore Stores</Button>
             </div>
           </section>
 
-          {/* Product Grid */}
+          {/* Product Grid - Location Aware */}
           <section className="space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-black text-foreground tracking-tight">Top Local Discoveries</h2>
+              <div className="space-y-1">
+                <h2 className="text-2xl font-black text-foreground tracking-tight">Top Local Discoveries</h2>
+                <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Verified Stock in {selectedCity}</p>
+              </div>
               <Button variant="link" className="text-primary font-bold">View More</Button>
             </div>
             
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-              {products.map((product) => (
-                <Card key={product.id} className="group overflow-hidden border-none shadow-none hover:shadow-xl dark:hover:shadow-primary/5 transition-all duration-300 rounded-2xl bg-card">
-                  <CardContent className="p-0">
-                    <div className="relative aspect-square overflow-hidden bg-muted rounded-2xl">
-                      <Image 
-                        src={product.img} 
-                        alt={product.name} 
-                        fill 
-                        className="object-cover transition-transform duration-500 group-hover:scale-105" 
-                        data-ai-hint="product image"
-                      />
-                      <Badge className="absolute top-3 left-3 bg-background/90 backdrop-blur-sm text-primary font-black text-[10px] border-none px-2 shadow-sm">
-                        VERIFIED STOCK
-                      </Badge>
-                    </div>
-                    
-                    <div className="p-4 space-y-2">
-                      <div className="flex items-center gap-1.5 text-primary">
-                        <MapPin className="w-3.5 h-3.5" />
-                        <p className="text-xs font-black uppercase tracking-wider">
-                          Available at: <span className="text-foreground underline decoration-primary/30 font-black">{product.shop}</span>
-                        </p>
+            {filteredProducts.length > 0 ? (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                {filteredProducts.map((product) => (
+                  <Card key={product.id} className="group overflow-hidden border-none shadow-none hover:shadow-xl dark:hover:shadow-primary/5 transition-all duration-300 rounded-2xl bg-card">
+                    <CardContent className="p-0">
+                      <div className="relative aspect-square overflow-hidden bg-muted rounded-2xl">
+                        <Image 
+                          src={product.img} 
+                          alt={product.name} 
+                          fill 
+                          className="object-cover transition-transform duration-500 group-hover:scale-105" 
+                          data-ai-hint="product image"
+                        />
+                        <Badge className="absolute top-3 left-3 bg-background/90 backdrop-blur-sm text-primary font-black text-[10px] border-none px-2 shadow-sm uppercase">
+                          In Stock: {product.city}
+                        </Badge>
                       </div>
                       
-                      <h3 className="text-sm md:text-base font-bold text-foreground line-clamp-1 group-hover:text-primary transition-colors">
-                        {product.name}
-                      </h3>
-                      
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center bg-primary/10 text-primary px-1.5 py-0.5 rounded text-[10px] font-bold">
-                          ★ {product.rating}
+                      <div className="p-4 space-y-2">
+                        <div className="flex flex-col gap-0.5">
+                          <div className="flex items-center gap-1.5 text-primary">
+                            <Grid className="w-3.5 h-3.5" />
+                            <p className="text-[11px] font-black uppercase tracking-wider truncate">
+                              {product.shop}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-1.5 text-muted-foreground">
+                            <MapPin className="w-3 h-3" />
+                            <p className="text-[10px] font-bold truncate">
+                              {product.location}
+                            </p>
+                          </div>
                         </div>
-                        <span className="text-[10px] text-muted-foreground font-bold uppercase">100+ views today</span>
-                      </div>
+                        
+                        <h3 className="text-sm md:text-base font-bold text-foreground line-clamp-1 group-hover:text-primary transition-colors mt-1">
+                          {product.name}
+                        </h3>
+                        
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center bg-primary/10 text-primary px-1.5 py-0.5 rounded text-[10px] font-bold">
+                            ★ {product.rating}
+                          </div>
+                          <span className="text-[10px] text-muted-foreground font-bold uppercase">Nearest Store</span>
+                        </div>
 
-                      <div className="pt-2 flex items-center justify-between border-t border-border mt-2">
-                        <div className="flex flex-col">
-                          <span className="text-lg font-black text-foreground leading-tight">{product.price}</span>
-                          <span className="text-[10px] text-muted-foreground line-through font-bold">{product.oldPrice}</span>
+                        <div className="pt-2 flex items-center justify-between border-t border-border mt-2">
+                          <div className="flex flex-col">
+                            <span className="text-lg font-black text-foreground leading-tight">{product.price}</span>
+                            <span className="text-[10px] text-muted-foreground line-through font-bold">{product.oldPrice}</span>
+                          </div>
+                          <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[10px] h-9 rounded-xl px-4 shadow-sm transition-transform active:scale-95">
+                            Locate
+                          </Button>
                         </div>
-                        <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[10px] h-9 rounded-xl px-4 shadow-sm">
-                          Locate Store
-                        </Button>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <div className="py-20 text-center space-y-4 bg-muted/20 rounded-[2.5rem]">
+                <div className="bg-muted p-4 w-16 h-16 rounded-full mx-auto flex items-center justify-center">
+                  <Search className="w-8 h-8 text-muted-foreground" />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="text-lg font-black">No results in {selectedCity}</h3>
+                  <p className="text-sm text-muted-foreground font-medium">Try searching in a different area or adjusting your filters.</p>
+                </div>
+                <Button onClick={() => setIsDrawerOpen(true)} className="rounded-full px-8">Browse Other Areas</Button>
+              </div>
+            )}
           </section>
 
           {/* Local Shops Promotion */}
@@ -207,12 +292,12 @@ export default function StorefrontPage() {
             <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 blur-[100px] rounded-full" />
             <div className="flex flex-col md:flex-row items-center gap-12 relative z-10">
               <div className="flex-1 space-y-6 text-center md:text-left">
-                <h2 className="text-3xl md:text-5xl font-black uppercase">Support Your Local Shopkeepers</h2>
+                <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tight">Support Nawada District Shopkeepers</h2>
                 <p className="text-gray-400 dark:text-muted-foreground text-lg font-medium max-w-xl">
-                  NexaMart connects you directly with verified local businesses. Discover deals, check availability, and shop local.
+                  NexaMart connects you directly with verified businesses in {selectedCity}. Discover deals, check availability, and shop local.
                 </p>
                 <div className="flex flex-wrap justify-center md:justify-start gap-4 pt-4">
-                  <Button className="bg-primary hover:bg-primary/90 font-black rounded-full px-10 h-14 border-none">Find Shops Near Me</Button>
+                  <Button onClick={() => setIsDrawerOpen(true)} className="bg-primary hover:bg-primary/90 font-black rounded-full px-10 h-14 border-none">Find Shops Near Me</Button>
                   <Button variant="outline" className="border-white/20 dark:border-border text-white hover:bg-white/10 dark:hover:bg-muted font-black rounded-full px-10 h-14">Partner with Us</Button>
                 </div>
               </div>
