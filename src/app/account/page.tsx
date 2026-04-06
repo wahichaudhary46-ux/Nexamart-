@@ -7,7 +7,6 @@ import {
   User, 
   MapPin, 
   LogOut, 
-  ChevronRight,
   Home,
   Grid,
   Play,
@@ -50,11 +49,11 @@ export default function AccountPage() {
 
   const InfoRow = ({ label, value, icon: Icon }: { label: string, value: string | null | undefined, icon?: any }) => (
     <div className="flex items-baseline py-3 border-b border-slate-100 last:border-0">
-      <span className="w-28 text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+      <span className="w-24 text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
         {Icon && <Icon className="w-3 h-3" />}
         {label}
       </span>
-      <span className="flex-1 text-sm font-bold text-slate-800 dark:text-gray-200 truncate">
+      <span className="flex-1 text-[13px] font-bold text-slate-800 dark:text-gray-200 truncate">
         {value || "Not Set"}
       </span>
     </div>
@@ -65,38 +64,35 @@ export default function AccountPage() {
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-[480px] w-full bg-white dark:bg-gray-900 rounded-[36px] shadow-2xl overflow-hidden border border-white/20"
+        className="max-w-[400px] w-full bg-white dark:bg-gray-900 rounded-[36px] shadow-2xl overflow-hidden border border-white/20"
       >
         {/* Header - Dark & Premium */}
         <header className="bg-[#1a2a3f] p-8 text-center text-white relative overflow-hidden">
           <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full -mr-16 -mt-16 blur-3xl" />
           
-          <h1 className="text-2xl font-black tracking-tight mb-2 relative z-10">
+          <h1 className="text-xl md:text-2xl font-black tracking-tight mb-2 relative z-10">
             {userProfile?.fullName || "User Profile"}
           </h1>
           
-          <div className="inline-block bg-white/10 backdrop-blur-md px-4 py-1 rounded-full text-xs font-bold mb-4 relative z-10">
-            NexaMart Member
+          <div className="inline-block bg-white/10 backdrop-blur-md px-4 py-1.5 rounded-full text-[10px] md:text-xs font-bold mb-4 relative z-10">
+            ID: {nexaId}
           </div>
           
           <div className="flex items-center justify-center gap-1.5 text-[11px] font-bold opacity-80 uppercase tracking-widest relative z-10">
-            <MapPin className="w-3 h-3 text-blue-400" />
+            <span className="text-blue-400">📍</span>
             {userProfile?.city || "Location Not Set"}
           </div>
         </header>
 
         {/* Content Section */}
-        <div className="p-6 md:p-8 space-y-8">
+        <div className="p-6 md:p-8 space-y-6">
           
           {/* Section: Personal Info */}
           <section>
-            <h2 className="text-sm font-black text-slate-900 dark:text-white mb-4 border-l-4 border-blue-500 pl-3 flex items-center justify-between">
-              PERSONAL INFORMATION
-              <User className="w-4 h-4 text-blue-500" />
+            <h2 className="text-sm font-black text-[#1e2f3e] dark:text-white mb-4 border-l-4 border-blue-500 pl-3">
+              Personal Information
             </h2>
             <div className="space-y-1">
-              <InfoRow label="ID" value={nexaId} icon={Hash} />
-              <InfoRow label="Full Name" value={userProfile?.fullName} />
               <InfoRow label="Email" value={userProfile?.email} icon={Mail} />
               <InfoRow label="Phone" value={userProfile?.mobileNumber} icon={Phone} />
               <InfoRow label="Bio" value="NexaMart Verified Shopper" icon={Info} />
@@ -105,26 +101,25 @@ export default function AccountPage() {
 
           {/* Section: Address Block */}
           <section>
-            <h2 className="text-sm font-black text-slate-900 dark:text-white mb-4 border-l-4 border-blue-500 pl-3 flex items-center justify-between">
-              ADDRESS DETAILS
-              <MapPin className="w-4 h-4 text-blue-500" />
+            <h2 className="text-sm font-black text-[#1e2f3e] dark:text-white mb-4 border-l-4 border-blue-500 pl-3">
+              Default Address
             </h2>
-            <div className="bg-slate-50 dark:bg-slate-800/50 rounded-[24px] p-5 space-y-4">
-              <div className="flex justify-between items-start">
-                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Primary Residence</span>
-                <Globe className="w-4 h-4 text-slate-300" />
+            <div className="bg-[#f8fafc] dark:bg-slate-800/50 rounded-[24px] p-5 shadow-inner border border-slate-100 dark:border-slate-800">
+              <div className="flex justify-between items-start mb-4">
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Primary Hub</span>
+                <Globe className="w-3.5 h-3.5 text-slate-300" />
               </div>
-              <p className="text-sm font-bold text-slate-800 dark:text-gray-200 leading-relaxed">
-                {userProfile?.address || "No address saved. Add one in settings to enjoy faster local discovery."}
+              <p className="text-[13px] font-bold text-slate-800 dark:text-gray-200 leading-relaxed mb-4">
+                {userProfile?.address || "No address saved yet."}
               </p>
-              <div className="pt-2 border-t border-slate-200 dark:border-slate-700 flex items-center gap-4">
+              <div className="pt-2 border-t border-slate-200 dark:border-slate-700 flex items-center gap-6">
                 <div className="flex flex-col">
-                  <span className="text-[9px] font-black text-slate-400 uppercase">City/State</span>
+                  <span className="text-[9px] font-black text-slate-400 uppercase">City</span>
                   <span className="text-xs font-bold">{userProfile?.city || "N/A"}</span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[9px] font-black text-slate-400 uppercase">Postal Code</span>
-                  <span className="text-xs font-bold">Local Area</span>
+                  <span className="text-[9px] font-black text-slate-400 uppercase">State</span>
+                  <span className="text-xs font-bold">Bihar</span>
                 </div>
               </div>
             </div>
@@ -134,7 +129,7 @@ export default function AccountPage() {
           <Button 
             onClick={handleSignOut}
             variant="ghost" 
-            className="w-full h-12 rounded-2xl text-red-500 font-black text-xs hover:bg-red-50 dark:hover:bg-red-950/20 border border-slate-100 dark:border-slate-800"
+            className="w-full h-11 rounded-2xl text-red-500 font-black text-xs hover:bg-red-50 dark:hover:bg-red-950/20 border border-slate-100 dark:border-slate-800 transition-all active:scale-[0.98]"
           >
             <LogOut className="w-4 h-4 mr-2" />
             SIGN OUT FROM NEXAMART
@@ -176,4 +171,3 @@ export default function AccountPage() {
     </div>
   );
 }
-
