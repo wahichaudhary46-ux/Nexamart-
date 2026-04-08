@@ -58,3 +58,19 @@
     @apply bg-background text-foreground font-body;
   }
 }
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+  .rotate-y-12 {
+    transform: rotateY(8deg);
+  }
+}

@@ -243,7 +243,7 @@ export default function NextGenDashboard() {
           </div>
 
           <div className="flex gap-5 overflow-x-auto no-scrollbar pb-10 -mx-4 px-4 pt-2">
-            {SHOPS.filter(s => s.city === selectedCity || true).map((shop, idx) => (
+            {SHOPS.filter(s => s.city === selectedCity).map((shop, idx) => (
               <motion.div
                 key={shop.id}
                 initial={{ opacity: 0, x: 50 }}
@@ -325,23 +325,6 @@ export default function NextGenDashboard() {
           <span className="text-[9px] font-black uppercase tracking-tight">Profile</span>
         </Link>
       </nav>
-
-      <style jsx global>{`
-        .no-scrollbar::-webkit-scrollbar {
-          display: none;
-        }
-        .no-scrollbar {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-        .perspective-1000 {
-          perspective: 1000px;
-        }
-        .rotate-y-12 {
-          transform: rotateY(8deg);
-        }
-      `}</style>
-
     </div>
   );
 }
