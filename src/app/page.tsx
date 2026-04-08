@@ -95,7 +95,7 @@ export default function NextGenDashboard() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/40 to-slate-100 animate-gradient bg-[length:400%_400%] flex flex-col pb-20 font-body transition-colors duration-500 overflow-x-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/40 to-slate-100 flex flex-col pb-20 font-body transition-colors duration-500 overflow-x-hidden">
       
       {/* Navbar - Compact & Glass */}
       <nav className="flex items-center justify-between gap-2 px-3 py-2 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md w-full border-b border-white/20 sticky top-0 z-50 shadow-sm transition-all duration-300">
@@ -123,7 +123,7 @@ export default function NextGenDashboard() {
         <div className="flex-shrink-0 flex items-center">
           <button className="relative p-1.5 hover:bg-slate-100 dark:hover:bg-gray-800 rounded-full transition-colors">
             <Bell className="h-5 w-5 text-slate-600 dark:text-slate-400" />
-            <span className="absolute top-1 right-1 block h-2 w-2 rounded-full bg-rose-500 ring-2 ring-white dark:ring-gray-900 animate-pulse"></span>
+            <span className="absolute top-1 right-1 block h-2 w-2 rounded-full bg-rose-500 ring-2 ring-white dark:ring-gray-900"></span>
           </button>
         </div>
       </nav>
@@ -188,8 +188,7 @@ export default function NextGenDashboard() {
         {/* 1. Local Live Radar (Smart Island) */}
         <div className="mx-1 py-2.5 px-4 bg-black/85 backdrop-blur-xl border border-white/10 rounded-full flex items-center gap-3 shadow-[0_8px_32px_rgba(0,0,0,0.2),0_0_20px_rgba(59,130,246,0.4)] relative group overflow-hidden">
           <div className="relative shrink-0">
-            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_12px_#10b981]" />
-            <div className="absolute inset-0 bg-emerald-500 rounded-full animate-ping opacity-25" />
+            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_12px_#10b981]" />
           </div>
           
           <div className="flex-1 overflow-hidden">
@@ -295,7 +294,7 @@ export default function NextGenDashboard() {
         {/* Discovery CTA */}
         <section className="pt-4">
           <div className="bg-indigo-600 rounded-[40px] p-8 text-center text-white relative overflow-hidden shadow-2xl">
-            <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl animate-pulse" />
+            <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl" />
             <h2 className="text-2xl font-black tracking-tight mb-2 relative z-10">Expand Your Local Area</h2>
             <p className="text-indigo-100 text-xs font-medium mb-6 relative z-10 opacity-80">We are adding 50+ new shops in Hisua & Nawada this week!</p>
             <Button className="bg-white text-indigo-600 hover:bg-indigo-50 font-black px-8 h-12 rounded-2xl relative z-10 shadow-xl">
