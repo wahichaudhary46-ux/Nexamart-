@@ -1,7 +1,7 @@
 
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { 
   Mail, 
@@ -24,17 +24,18 @@ export default function AccountPage() {
   const { user, userProfile, loading, signOut } = useAuthContext();
   const router = useRouter();
 
-  if (loading) {
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push("/login");
+    }
+  }, [user, loading, router]);
+
+  if (loading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#e0eafc]">
         <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#1a2a3f]"></div>
       </div>
     );
-  }
-
-  if (!user) {
-    router.push("/login");
-    return null;
   }
 
   const handleSignOut = async () => {
@@ -59,7 +60,7 @@ export default function AccountPage() {
           <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full -mr-16 -mt-16 blur-3xl" />
           
           <h1 className="text-xl md:text-2xl font-bold tracking-tight mb-2 relative z-10">
-            {userProfile?.fullName || "Akash Kumar"}
+            {userProfile?.fullName || "Student User"}
           </h1>
           
           <div className="inline-block bg-white/20 backdrop-blur-md text-xs font-medium px-4 py-1.5 rounded-full mb-3 relative z-10">
