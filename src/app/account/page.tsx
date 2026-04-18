@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useEffect } from "react";
@@ -30,13 +29,15 @@ export default function AccountPage() {
     }
   }, [user, loading, router]);
 
-  if (loading || !user) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#e0eafc]">
         <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#1a2a3f]"></div>
       </div>
     );
   }
+
+  if (!user) return null;
 
   const handleSignOut = async () => {
     await signOut();
