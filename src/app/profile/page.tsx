@@ -1,141 +1,160 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth, useFirestore } from '@/firebase';
-import { onAuthStateChanged } from 'firebase/auth';
+import { auth, db } from '@/firebase/config';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
-import { User, GraduationCap, MapPin, Info, Loader2 } from 'lucide-react';
+import { User, BookOpen, MapPin, Calendar, LogOut, Mail, GraduationCap, Info } from 'lucide-react';
 
-export default function ProfilePage() {
+export default function UserProfile() {
   const router = useRouter();
-  const auth = useAuth();
-  const db = useFirestore();
-  const [studentData, setStudentData] = useState<any>(null);
+  const [userData, setUserData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
+  // Firebase से Onboarding का डेटा मँगाना
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (!currentUser) {
-        router.push('/login');
-        return;
-      }
-      
-      try {
-        // Fetch from 'students' collection as defined in onboarding
-        const docRef = doc(db, 'students', currentUser.uid);
-        const docSnap = await getDoc(docRef);
-        
-        if (docSnap.exists()) {
-          setStudentData(docSnap.data());
-        } else {
-          // Redirect to onboarding if profile is missing
-          router.push('/onboarding');
+      if (currentUser) {
+        try {
+          const docRef = doc(db, 'students', currentUser.uid);
+          const docSnap = await getDoc(docRef);
+          
+          if (docSnap.exists()) {
+            setUserData(docSnap.data());
+          } else {
+            console.log("No data found! Redirecting to onboarding...");
+            router.push('/onboarding');
+          }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        } finally {
+          setLoading(false);
         }
-      } catch (error) {
-        console.error("Error fetching student profile:", error);
-      } finally {
-        setLoading(false);
+      } else {
+        router.push('/login');
       }
     });
+
     return () => unsubscribe();
-  }, [auth, db, router]);
+  }, [router]);
+
+  const handleLogout = async () => {
+    await signOut(auth);
+    router.push('/login');
+  };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 to-indigo-950 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-blue-400 animate-spin" />
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
 
-  if (!studentData) return null;
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 py-10 px-4">
-      <div className="max-w-3xl mx-auto">
-        {/* Glassmorphism Card */}
-        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-6 md:p-8 shadow-2xl">
-          
-          {/* Header with Avatar */}
-          <div className="flex flex-col md:flex-row gap-6 items-center md:items-start border-b border-white/20 pb-6">
-            <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center text-3xl font-black text-white shadow-xl">
-              {studentData.name?.charAt(0) || 'U'}
+    <div className="min-h-screen bg-slate-50 font-sans pb-24">
+      
+      {/* --- 1. Top Header & Profile Card --- */}
+      <div className="bg-blue-600 px-6 pt-12 pb-24 rounded-b-[40px] shadow-lg text-white relative">
+        <h1 className="text-center text-lg font-black tracking-widest uppercase mb-6">My Profile</h1>
+        
+        <div className="absolute -bottom-16 left-0 w-full px-6">
+          <div className="bg-white rounded-[24px] p-6 shadow-xl border border-gray-100 flex flex-col items-center text-center">
+            
+            <div className="w-24 h-24 bg-gradient-to-tr from-blue-100 to-blue-50 rounded-full border-4 border-white shadow-md flex items-center justify-center -mt-16 mb-3 overflow-hidden">
+              {userData?.profilePic ? (
+                <img src={userData.profilePic} alt="Profile" className="w-full h-full object-cover" />
+              ) : (
+                <User className="w-10 h-10 text-blue-400" />
+              )}
             </div>
-            <div className="text-center md:text-left">
-              <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">{studentData.name}</h1>
-              <p className="text-blue-300 text-sm opacity-80">{studentData.email}</p>
-              <div className="flex flex-wrap gap-2 mt-3 justify-center md:justify-start">
-                <span className="bg-blue-500/20 border border-blue-500/30 text-blue-100 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">
-                  {studentData.class || studentData.className}
-                </span>
-                {studentData.stream && (
-                  <span className="bg-indigo-500/20 border border-indigo-500/30 text-indigo-100 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">
-                    {studentData.stream}
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Personal Details */}
-          <div className="mt-8 space-y-5">
-            <h2 className="text-sm font-black text-blue-400 uppercase tracking-[0.2em] flex items-center gap-2">
-              <User size={16} /> Personal Details
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <InfoCard label="Full Name" value={studentData.name} />
-              <InfoCard label="Email" value={studentData.email} />
-              <InfoCard label="Date of Birth" value={studentData.dob} />
-              <InfoCard label="Gender" value={studentData.gender} />
-              <InfoCard label="Bio" value={studentData.bio} fullWidth />
-            </div>
-          </div>
-
-          {/* Academic Details */}
-          <div className="mt-10 space-y-5">
-            <h2 className="text-sm font-black text-blue-400 uppercase tracking-[0.2em] flex items-center gap-2">
-              <GraduationCap size={16} /> Academic Record
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <InfoCard label="Class / Level" value={studentData.class || studentData.className} />
-              <InfoCard label="Stream" value={studentData.stream} />
-              <InfoCard label="Target Exam" value={studentData.exam} />
-              <InfoCard label="Admission ID" value={studentData.admissionNo} />
-            </div>
-          </div>
-
-          {/* Location Details */}
-          <div className="mt-10 space-y-5">
-            <h2 className="text-sm font-black text-blue-400 uppercase tracking-[0.2em] flex items-center gap-2">
-              <MapPin size={16} /> Campus Location
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <InfoCard label="City" value={studentData.city} />
-              <InfoCard label="State" value={studentData.state} />
-              <InfoCard label="Country" value={studentData.country} />
-            </div>
-          </div>
-
-          {/* Last Updated Footer */}
-          <div className="mt-10 pt-6 border-t border-white/10 text-center">
-            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-[0.1em]">
-              Profile Identity Verified • Last Sync: {studentData.lastUpdated ? new Date(studentData.lastUpdated.seconds * 1000).toLocaleDateString() : 'Today'}
+            
+            <h2 className="text-xl font-black text-gray-800">{userData?.name || "Student Name"}</h2>
+            <p className="text-sm font-bold text-gray-400 flex items-center justify-center gap-1 mt-1">
+              <Mail className="w-3.5 h-3.5" /> {userData?.email}
             </p>
+
+            <div className="mt-4 inline-flex items-center gap-2 bg-green-50 px-4 py-1.5 rounded-full border border-green-100">
+              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+              <span className="text-xs font-black text-green-700 tracking-wider">ADMISSION NO: {userData?.admissionNo || "1"}</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  );
-}
 
-function InfoCard({ label, value, fullWidth = false }: { label: string; value?: string; fullWidth?: boolean }) {
-  return (
-    <div className={`bg-white/5 border border-white/10 rounded-2xl p-4 hover:bg-white/10 transition-all duration-300 ${fullWidth ? 'md:col-span-2' : ''}`}>
-      <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest flex items-center gap-1.5">
-        <Info size={10} className="text-blue-500" /> {label}
-      </p>
-      <p className="text-white font-bold mt-1 text-sm break-words">{value || 'Not provided'}</p>
+      {/* Spacing for the overlapping card */}
+      <div className="mt-24 px-6 space-y-4">
+
+        {/* --- 2. Academic Details --- */}
+        <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+          <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+            <GraduationCap className="w-4 h-4 text-blue-500" /> Academic Info
+          </h3>
+          <div className="grid grid-cols-2 gap-y-4">
+            <div>
+              <p className="text-[10px] text-gray-400 font-bold uppercase">Class / Level</p>
+              <p className="text-sm font-bold text-gray-800">{userData?.className || "N/A"}</p>
+            </div>
+            <div>
+              <p className="text-[10px] text-gray-400 font-bold uppercase">Target Exam</p>
+              <p className="text-sm font-bold text-gray-800">{userData?.exam || "N/A"}</p>
+            </div>
+            {userData?.stream && (
+              <div>
+                <p className="text-[10px] text-gray-400 font-bold uppercase">Stream</p>
+                <p className="text-sm font-bold text-gray-800">{userData?.stream}</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* --- 3. Personal Details --- */}
+        <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+          <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+            <Info className="w-4 h-4 text-blue-500" /> Personal Info
+          </h3>
+          <div className="grid grid-cols-2 gap-y-4">
+            <div>
+              <p className="text-[10px] text-gray-400 font-bold uppercase">Date of Birth</p>
+              <p className="text-sm font-bold text-gray-800">{userData?.dob || "N/A"}</p>
+            </div>
+            <div>
+              <p className="text-[10px] text-gray-400 font-bold uppercase">Gender</p>
+              <p className="text-sm font-bold text-gray-800">{userData?.gender || "N/A"}</p>
+            </div>
+            <div className="col-span-2">
+              <p className="text-[10px] text-gray-400 font-bold uppercase">Bio</p>
+              <p className="text-sm font-medium text-gray-600 mt-1">{userData?.bio || "No bio provided."}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* --- 4. Location Details --- */}
+        <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+          <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+            <MapPin className="w-4 h-4 text-blue-500" /> Location
+          </h3>
+          <p className="text-sm font-bold text-gray-800">
+            {userData?.city ? `${userData.city}, ${userData.state}, ${userData.country}` : "N/A"}
+          </p>
+        </div>
+
+        {/* --- 5. Logout / Actions --- */}
+        <div className="pt-4">
+          <button 
+            onClick={handleLogout}
+            className="w-full flex items-center justify-center gap-2 bg-red-50 text-red-600 font-bold py-4 rounded-xl hover:bg-red-100 transition-colors"
+          >
+            <LogOut className="w-5 h-5" /> Logout
+          </button>
+          <p className="text-center text-[10px] text-gray-400 mt-4 font-medium">
+            Name & Profile updates are restricted to once a year. Contact Admin for changes.
+          </p>
+        </div>
+
+      </div>
+
     </div>
   );
 }
