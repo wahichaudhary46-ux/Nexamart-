@@ -30,8 +30,17 @@ export interface UserProfile {
   fullName: string;
   mobileNumber: string;
   city: string;
+  state?: string;
+  country?: string;
   address: string;
   photoURL: string | null;
+  dob?: string;
+  gender?: string;
+  bio?: string;
+  class?: string;
+  exam?: string;
+  stream?: string;
+  admissionNo?: string;
   createdAt: any;
   updatedAt: any;
   isProfileComplete: boolean;
@@ -64,7 +73,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Helper to fetch profile with error handling
   const fetchUserProfile = async (uid: string) => {
     const docRef = doc(db, "users", uid);
     try {
@@ -83,7 +91,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return null;
   };
 
-  // Helper to initialize a profile
   const createInitialProfile = async (user: User): Promise<UserProfile> => {
     const initialProfile: UserProfile = {
       uid: user.uid,
@@ -228,5 +235,4 @@ export function useAuthContext() {
   return context;
 }
 
-// Alias for convenience as requested in user snippets
 export const useAuth = useAuthContext;
