@@ -1,72 +1,82 @@
 
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/components/auth-provider";
-import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
-import { useFirestore } from "@/firebase";
-import { Camera, ChevronRight, ArrowLeft, Sparkles, Loader2 } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuthContext } from '@/components/auth-provider';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { useFirestore } from '@/firebase';
+import { Camera, AlertCircle, Info, User, GraduationCap, MapPin, Sparkles, Loader2 } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
 
 export default function OnboardingPage() {
-  const { user, userProfile, loading } = useAuth();
-  const db = useFirestore();
   const router = useRouter();
-  const [step, setStep] = useState(1);
-  const [saving, setSaving] = useState(false);
+  const { user, userProfile, loading } = useAuthContext();
+  const db = useFirestore();
 
   const [formData, setFormData] = useState({
-    fullName: "",
-    gender: "",
-    class: "",
-    city: "",
-    state: "",
-    country: "India",
-    bio: "",
+    fullName: '',
+    photoURL: '',
+    dob: '',
+    gender: '',
+    admissionNo: '1',
+    bio: '',
+    class: '',
+    exam: '',
+    stream: '',
+    city: '',
+    state: '',
+    country: 'India'
   });
 
+  const [saving, setSaving] = useState(false);
+
   useEffect(() => {
-    // Redirect logic: if not loading and no user, go to login.
-    // If profile is already complete, go to home.
     if (!loading) {
       if (!user) {
-        router.push("/login");
+        router.push('/login');
       } else if (userProfile?.isProfileComplete) {
-        router.push("/");
+        router.push('/');
+      } else if (userProfile) {
+        setFormData(prev => ({
+          ...prev,
+          fullName: userProfile.fullName || '',
+          photoURL: userProfile.photoURL || '',
+        }));
       }
     }
   }, [user, userProfile, loading, router]);
 
-  const handleNext = () => setStep((prev) => prev + 1);
-  const handleBack = () => setStep((prev) => prev - 1);
+  const handleFinish = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.fullName || !formData.class) {
+      toast({
+        variant: "destructive",
+        title: "Missing Information",
+        description: "Name and Class are required fields.",
+      });
+      return;
+    }
 
-  const handleFinish = async () => {
-    if (!user) return;
     setSaving(true);
     try {
-      const userRef = doc(db, "users", user.uid);
+      const userRef = doc(db, "users", user!.uid);
       const updateData = {
-        fullName: formData.fullName,
-        gender: formData.gender,
-        class: formData.class,
-        city: formData.city,
-        state: formData.state,
-        country: formData.country,
-        bio: formData.bio,
+        ...formData,
         isProfileComplete: true,
         updatedAt: serverTimestamp(),
       };
 
-      await updateDoc(userRef, updateData);
+      await setDoc(userRef, updateData, { merge: true });
+      
       toast({
         title: "Profile Completed",
         description: "Welcome to Nexa-Library! Your portal is ready.",
       });
-      router.push("/");
-    } catch (error: any) {
-      console.error("Error saving profile:", error);
+      
+      router.push('/');
+    } catch (err: any) {
+      console.error("Error saving profile:", err);
       toast({
         variant: "destructive",
         title: "Error",
@@ -79,213 +89,212 @@ export default function OnboardingPage() {
 
   if (loading || !user) {
     return (
-      <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center text-white">
-        <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-        <h2 className="font-bold text-lg tracking-widest animate-pulse">Setting up your profile...</h2>
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 to-indigo-950 flex flex-col items-center justify-center text-white">
+        <Loader2 className="w-12 h-12 text-blue-500 animate-spin mb-4" />
+        <h2 className="font-bold tracking-widest animate-pulse">Loading setup...</h2>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white font-sans p-6 flex flex-col items-center selection:bg-blue-500/30">
-      {/* Progress Bar */}
-      <div className="w-full max-w-sm flex justify-between mb-12 mt-10 gap-3">
-        {[1, 2, 3].map((s) => (
-          <div
-            key={s}
-            className={`h-2 flex-1 rounded-full transition-all duration-500 ${
-              step >= s ? "bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.5)]" : "bg-slate-800"
-            }`}
-          ></div>
-        ))}
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 font-body py-10 px-4 flex flex-col items-center relative overflow-hidden">
+      
+      {/* 3D Animated Background Elements */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-20 -left-20 w-72 h-72 bg-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 -right-20 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/3 left-1/4 w-48 h-48 bg-purple-500/10 rounded-full blur-2xl animate-float"></div>
       </div>
 
-      <div className="w-full max-w-sm">
-        <AnimatePresence mode="wait">
-          {step === 1 && (
-            <motion.div
-              key="step1"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              className="space-y-6"
+      <div className="w-full max-w-3xl relative z-10 perspective-1000">
+        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-6 md:p-8 transform transition-all duration-500 hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)]">
+          
+          <div className="text-center mb-8">
+            <div className="inline-flex p-3 bg-blue-500/20 rounded-2xl mb-3">
+              <Sparkles className="w-8 h-8 text-blue-300" />
+            </div>
+            <h1 className="text-3xl font-black bg-gradient-to-r from-white to-blue-300 bg-clip-text text-transparent">Complete Your Profile</h1>
+            <p className="text-sm text-blue-200/70 mt-1">Fill your details to unlock the full library experience</p>
+          </div>
+
+          <form onSubmit={handleFinish} className="space-y-8">
+            
+            {/* SECTION 1: Personal Details */}
+            <div className="space-y-4">
+              <h2 className="text-lg font-bold text-blue-300 flex items-center gap-2 border-b border-blue-500/30 pb-2">
+                <User className="w-5 h-5" /> 1. Your Details
+              </h2>
+              
+              <div className="bg-orange-500/20 border border-orange-500/40 p-4 rounded-xl flex gap-3 items-start backdrop-blur-sm">
+                <AlertCircle className="w-5 h-5 text-orange-300 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-xs font-bold text-orange-300 uppercase">Important Restriction</p>
+                  <p className="text-xs text-orange-100/80 mt-1">Name & Profile Picture can only be updated <b>once a year</b>. Contact Library Office for corrections.</p>
+                </div>
+              </div>
+
+              <div className="flex flex-col items-center my-4">
+                <div className="relative group cursor-pointer">
+                  <div className="w-24 h-24 bg-gradient-to-br from-gray-700 to-gray-800 rounded-2xl border-2 border-dashed border-white/30 flex items-center justify-center shadow-inner group-hover:border-blue-400 transition-all">
+                    {formData.photoURL ? (
+                      <img src={formData.photoURL} alt="Profile" className="w-full h-full object-cover rounded-2xl" />
+                    ) : (
+                      <Camera className="text-gray-400 w-7 h-7 group-hover:text-blue-300" />
+                    )}
+                  </div>
+                  <div className="absolute -bottom-2 -right-2 bg-blue-500 rounded-full p-1.5 shadow-lg">
+                    <Camera className="w-3 h-3 text-white" />
+                  </div>
+                </div>
+                <span className="text-[11px] text-gray-400 mt-2">Upload Profile Photo (optional)</span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input 
+                  type="text" 
+                  placeholder="Full Name *" 
+                  required 
+                  value={formData.fullName}
+                  className="w-full bg-white/10 border border-white/20 p-3.5 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-sm text-white placeholder:text-gray-400 transition-all"
+                  onChange={(e) => setFormData({...formData, fullName: e.target.value})} 
+                />
+                
+                <input 
+                  type="email" 
+                  disabled 
+                  value={user.email || ''}
+                  className="w-full bg-white/5 border border-white/10 p-3.5 rounded-xl text-gray-400 text-sm cursor-not-allowed" 
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <input 
+                  type="date" 
+                  value={formData.dob}
+                  className="w-full bg-white/10 border border-white/20 p-3.5 rounded-xl outline-none text-sm text-white [color-scheme:dark]"
+                  onChange={(e) => setFormData({...formData, dob: e.target.value})} 
+                />
+                
+                <select 
+                  value={formData.gender}
+                  className="w-full bg-white/10 border border-white/20 p-3.5 rounded-xl outline-none text-sm text-white"
+                  onChange={(e) => setFormData({...formData, gender: e.target.value})}
+                >
+                  <option value="" className="bg-gray-800">Gender</option>
+                  <option value="Male" className="bg-gray-800">Male</option>
+                  <option value="Female" className="bg-gray-800">Female</option>
+                  <option value="Other" className="bg-gray-800">Other</option>
+                </select>
+              </div>
+
+              <textarea 
+                placeholder="Write a short bio about yourself..." 
+                value={formData.bio}
+                className="w-full bg-white/10 border border-white/20 p-3.5 rounded-xl outline-none text-sm h-20 resize-none text-white placeholder:text-gray-400"
+                onChange={(e) => setFormData({...formData, bio: e.target.value})} 
+              />
+            </div>
+
+            {/* SECTION 2: Academic Details */}
+            <div className="space-y-4">
+              <h2 className="text-lg font-bold text-blue-300 flex items-center gap-2 border-b border-blue-500/30 pb-2">
+                <GraduationCap className="w-5 h-5" /> 2. Education Details
+              </h2>
+              
+              <div className="bg-blue-500/20 border border-blue-500/30 p-3 rounded-xl flex gap-3 items-center">
+                <Info className="w-5 h-5 text-blue-300" />
+                <p className="text-xs text-blue-100">Library material will be customized based on your selected Class.</p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <select 
+                  required 
+                  value={formData.class}
+                  className="w-full bg-white/10 border border-white/20 p-3.5 rounded-xl outline-none text-sm text-white"
+                  onChange={(e) => setFormData({...formData, class: e.target.value})}
+                >
+                  <option value="" className="bg-gray-800">Select Class *</option>
+                  <option className="bg-gray-800" value="Class 9">Class 9</option>
+                  <option className="bg-gray-800" value="Class 10">Class 10</option>
+                  <option className="bg-gray-800" value="Class 11">Class 11</option>
+                  <option className="bg-gray-800" value="Class 12">Class 12</option>
+                  <option className="bg-gray-800" value="JEE">JEE Aspirant</option>
+                  <option className="bg-gray-800" value="NEET">NEET Aspirant</option>
+                  <option className="bg-gray-800" value="UPSC">UPSC</option>
+                  <option className="bg-gray-800" value="Other">Other Govt Exams</option>
+                </select>
+
+                <select 
+                  value={formData.stream}
+                  className="w-full bg-white/10 border border-white/20 p-3.5 rounded-xl outline-none text-sm text-white"
+                  onChange={(e) => setFormData({...formData, stream: e.target.value})}
+                >
+                  <option value="" className="bg-gray-800">Stream (If Applicable)</option>
+                  <option className="bg-gray-800" value="Science (PCM)">Science (PCM)</option>
+                  <option className="bg-gray-800" value="Science (PCB)">Science (PCB)</option>
+                  <option className="bg-gray-800" value="Commerce">Commerce</option>
+                  <option className="bg-gray-800" value="Arts">Arts</option>
+                </select>
+              </div>
+
+              <input 
+                type="text" 
+                placeholder="Target Exam (e.g. CBSE Boards, JEE 2025)" 
+                value={formData.exam}
+                className="w-full bg-white/10 border border-white/20 p-3.5 rounded-xl outline-none text-sm text-white placeholder:text-gray-400"
+                onChange={(e) => setFormData({...formData, exam: e.target.value})} 
+              />
+
+              <div className="w-full bg-white/5 border border-white/10 p-3.5 rounded-xl flex justify-between items-center">
+                <span className="text-xs text-gray-400 font-bold">Admission Number:</span>
+                <span className="text-sm text-green-400 font-black">{formData.admissionNo}</span>
+              </div>
+              <p className="text-[10px] text-gray-500 text-right mt-1">Automatically assigned. Tracked by admin.</p>
+            </div>
+
+            {/* SECTION 3: Location Details */}
+            <div className="space-y-4">
+              <h2 className="text-lg font-bold text-blue-300 flex items-center gap-2 border-b border-blue-500/30 pb-2">
+                <MapPin className="w-5 h-5" /> 3. Location Details
+              </h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input 
+                  type="text" 
+                  placeholder="City" 
+                  value={formData.city}
+                  className="w-full bg-white/10 border border-white/20 p-3.5 rounded-xl outline-none text-sm text-white placeholder:text-gray-400"
+                  onChange={(e) => setFormData({...formData, city: e.target.value})} 
+                />
+                
+                <input 
+                  type="text" 
+                  placeholder="State" 
+                  value={formData.state}
+                  className="w-full bg-white/10 border border-white/20 p-3.5 rounded-xl outline-none text-sm text-white placeholder:text-gray-400"
+                  onChange={(e) => setFormData({...formData, state: e.target.value})} 
+                />
+              </div>
+
+              <input 
+                type="text" 
+                disabled 
+                value={formData.country}
+                className="w-full bg-white/5 border border-white/10 p-3.5 rounded-xl text-gray-400 text-sm cursor-not-allowed" 
+              />
+            </div>
+
+            {/* Submit Button */}
+            <button 
+              type="submit" 
+              disabled={saving || !formData.fullName || !formData.class}
+              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 py-4 rounded-xl font-bold text-sm tracking-wide shadow-lg shadow-blue-900/30 transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2"
             >
-              <header>
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 mb-4">
-                  <Sparkles className="w-3.5 h-3.5 text-blue-400" />
-                  <span className="text-[10px] font-black uppercase tracking-widest text-blue-400">Step 01 / 03</span>
-                </div>
-                <h2 className="text-3xl font-black tracking-tight mb-2">Your Details 👤</h2>
-                <p className="text-slate-400 text-sm">Let's set up your member identity.</p>
-              </header>
+              {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : '🚀 SAVE & ENTER LIBRARY'}
+            </button>
 
-              <div className="flex flex-col items-center mb-6">
-                <div className="w-24 h-24 bg-slate-800 rounded-[2rem] border-2 border-dashed border-slate-700 flex items-center justify-center relative overflow-hidden group hover:border-blue-500 transition-all cursor-pointer">
-                  <Camera className="w-8 h-8 text-slate-500 group-hover:text-blue-400 transition-colors" />
-                </div>
-                <div className="mt-4 p-3 bg-orange-500/10 border border-orange-500/20 rounded-xl">
-                  <p className="text-[10px] text-orange-400 font-bold uppercase tracking-widest text-center leading-relaxed">
-                    ⚠️ Name & Profile can be updated once a year!
-                  </p>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black uppercase text-slate-500 ml-1 tracking-widest">Full Name</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Rahul Sharma"
-                    value={formData.fullName}
-                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                    className="w-full bg-slate-800/50 border border-slate-700 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all placeholder:text-slate-600"
-                    required
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black uppercase text-slate-500 ml-1 tracking-widest">Gender</label>
-                  <select
-                    value={formData.gender}
-                    onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
-                    className="w-full bg-slate-800/50 border border-slate-700 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all appearance-none"
-                  >
-                    <option value="" className="bg-slate-900">Select Gender</option>
-                    <option value="Male" className="bg-slate-900">Male</option>
-                    <option value="Female" className="bg-slate-900">Female</option>
-                    <option value="Other" className="bg-slate-900">Other</option>
-                  </select>
-                </div>
-              </div>
-
-              <button
-                onClick={handleNext}
-                disabled={!formData.fullName}
-                className="w-full h-16 bg-blue-600 hover:bg-blue-700 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-blue-900/40 disabled:opacity-50 transition-all active:scale-95 mt-4"
-              >
-                Next Step <ChevronRight className="ml-2 inline w-4 h-4" />
-              </button>
-
-              <p className="text-[9px] text-slate-600 text-center uppercase font-bold tracking-[0.2em]">
-                Galti hone par Library Office se contact karein
-              </p>
-            </motion.div>
-          )}
-
-          {step === 2 && (
-            <motion.div
-              key="step2"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              className="space-y-6"
-            >
-              <header>
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 mb-4">
-                  <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-                  <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400">Step 02 / 03</span>
-                </div>
-                <h2 className="text-3xl font-black tracking-tight mb-2">Education 📚</h2>
-                <p className="text-slate-400 text-sm">Target selection will customize your library feed.</p>
-              </header>
-
-              <div className="space-y-4">
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black uppercase text-slate-500 ml-1 tracking-widest">Class / Level</label>
-                  <select
-                    value={formData.class}
-                    onChange={(e) => setFormData({ ...formData, class: e.target.value })}
-                    className="w-full bg-slate-800/50 border border-slate-700 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all appearance-none"
-                  >
-                    <option value="" className="bg-slate-900">Select Class / Level</option>
-                    <option value="Class 10" className="bg-slate-900">Class 10</option>
-                    <option value="Class 12" className="bg-slate-900">Class 12</option>
-                    <option value="JEE" className="bg-slate-900">JEE Aspirant</option>
-                    <option value="NEET" className="bg-slate-900">NEET Aspirant</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="flex gap-4 mt-10">
-                <button
-                  onClick={handleBack}
-                  className="flex-1 h-16 bg-slate-800 hover:bg-slate-700 rounded-2xl font-black text-xs uppercase tracking-widest transition-all"
-                >
-                  <ArrowLeft className="mr-2 inline w-4 h-4" /> Back
-                </button>
-                <button
-                  onClick={handleNext}
-                  className="flex-1 h-16 bg-blue-600 hover:bg-blue-700 rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-lg shadow-blue-900/40"
-                >
-                  Next <ChevronRight className="ml-2 inline w-4 h-4" />
-                </button>
-              </div>
-            </motion.div>
-          )}
-
-          {step === 3 && (
-            <motion.div
-              key="step3"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              className="space-y-6"
-            >
-              <header>
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-4">
-                  <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-                  <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">Step 03 / 03</span>
-                </div>
-                <h2 className="text-3xl font-black tracking-tight mb-2">Location 📍</h2>
-                <p className="text-slate-400 text-sm">Where are you studying from?</p>
-              </header>
-
-              <div className="space-y-4">
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black uppercase text-slate-500 ml-1 tracking-widest">City</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Nawada"
-                    value={formData.city}
-                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                    className="w-full bg-slate-800/50 border border-slate-700 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black uppercase text-slate-500 ml-1 tracking-widest">State</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Bihar"
-                    value={formData.state}
-                    onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                    className="w-full bg-slate-800/50 border border-slate-700 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                  />
-                </div>
-              </div>
-
-              <div className="pt-8 space-y-4">
-                <button
-                  onClick={handleFinish}
-                  disabled={saving || !formData.city || !formData.state}
-                  className="w-full h-18 bg-gradient-to-br from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-[2rem] font-black text-lg uppercase tracking-widest shadow-2xl shadow-green-900/40 disabled:opacity-50 transition-all active:scale-95"
-                >
-                  {saving ? <Loader2 className="w-6 h-6 animate-spin mx-auto" /> : "FINISH & START STUDYING 🍯"}
-                </button>
-                <button
-                  onClick={handleBack}
-                  className="w-full text-slate-500 hover:text-white transition-colors font-black text-[10px] uppercase tracking-[0.3em]"
-                >
-                  Back to Education
-                </button>
-              </div>
-
-              <p className="text-[10px] text-slate-700 text-center uppercase font-bold tracking-widest mt-12 leading-relaxed">
-                By finishing, you agree to our Digital Library Terms.<br />Your IP is logged for security.
-              </p>
-            </motion.div>
-          )}
-        </AnimatePresence>
+          </form>
+        </div>
       </div>
     </div>
   );
