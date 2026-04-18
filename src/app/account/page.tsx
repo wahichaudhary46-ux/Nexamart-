@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -38,7 +37,7 @@ export default function AdvancedStudentProfile() {
   const [selectedBranch, setSelectedBranch] = useState(branches[0]);
   const [showBranchDropdown, setShowBranchDropdown] = useState(false);
 
-  // Seat booking (real-time mock)
+  // Seat booking
   const [seats] = useState([
     { id: 'A01', zone: 'Zone A', available: true, bookedBy: null },
     { id: 'A02', zone: 'Zone A', available: false, bookedBy: 'You' },
@@ -74,7 +73,6 @@ export default function AdvancedStudentProfile() {
       timerInterval.current = setInterval(() => {
         setSeconds(prev => {
           const newSec = prev + 1;
-          // Break reminder every 45 minutes (2700 seconds)
           if (newSec % 2700 === 0 && newSec !== 0) {
             setBreakReminder(true);
             setTimeout(() => setBreakReminder(false), 5000);
@@ -115,7 +113,7 @@ export default function AdvancedStudentProfile() {
   if (loading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-900"></div>
+        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -132,7 +130,7 @@ export default function AdvancedStudentProfile() {
       
       {/* 1. Header Area - Immersive Navy */}
       <div className="relative bg-[#1a2a3f] px-6 pt-8 pb-20 rounded-b-[40px] shadow-2xl text-white overflow-hidden">
-        {/* Static 3D Glows (No Pulse) */}
+        {/* Static 3D Glows */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
         
@@ -160,7 +158,7 @@ export default function AdvancedStudentProfile() {
           </button>
         </div>
 
-        {/* Floating Location Card (Smart Pill) */}
+        {/* Floating Location Card */}
         <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-3 border border-white/20 relative z-10 mt-2 shadow-inner">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5">
@@ -224,7 +222,7 @@ export default function AdvancedStudentProfile() {
         </div>
       </div>
 
-      {/* 2. Quick Stats Grid (3D Orbs) */}
+      {/* 2. Quick Stats Grid */}
       <div className="px-6 -mt-8 relative z-20">
         <div className="grid grid-cols-3 gap-2.5">
           <div className="bg-white rounded-2xl p-3 shadow-md border border-gray-100 flex flex-col items-center transform transition-transform active:scale-95">
@@ -245,7 +243,7 @@ export default function AdvancedStudentProfile() {
         </div>
       </div>
 
-      {/* 3. Advanced Study Timer with Break Logic */}
+      {/* 3. Advanced Study Timer */}
       <div className="px-6 mt-4">
         <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[32px] p-5 shadow-xl text-white relative overflow-hidden">
           <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
@@ -259,7 +257,7 @@ export default function AdvancedStudentProfile() {
                 className="absolute inset-0 bg-indigo-900/80 backdrop-blur-md flex items-center justify-center z-30"
               >
                 <div className="bg-white text-indigo-900 p-4 rounded-2xl flex flex-col items-center gap-2 shadow-2xl">
-                  <Coffee className="w-8 h-8 animate-bounce" />
+                  <Coffee className="w-8 h-8" />
                   <p className="text-xs font-black uppercase tracking-widest">Time for a Break!</p>
                   <p className="text-[10px] font-bold opacity-60">You've focused for 45 minutes.</p>
                 </div>
@@ -305,7 +303,7 @@ export default function AdvancedStudentProfile() {
         </div>
       </div>
 
-      {/* 4. Tab Navigation (Flipkart Style) */}
+      {/* 4. Tab Navigation */}
       <div className="px-6 mt-6">
         <div className="flex bg-gray-200/50 p-1 rounded-xl">
           {['overview', 'location', 'analytics', 'library'].map(tab => (
@@ -434,18 +432,6 @@ export default function AdvancedStudentProfile() {
             </div>
           </div>
         )}
-      </div>
-
-      {/* Logout Link */}
-      <div className="px-6 mt-8">
-        <Button 
-          onClick={handleSignOut}
-          variant="ghost" 
-          className="w-full h-10 rounded-2xl text-rose-500 font-black text-[10px] uppercase tracking-widest hover:bg-rose-50"
-        >
-          <LogOut className="w-3.5 h-3.5 mr-2" />
-          EXIT STUDENT PORTAL
-        </Button>
       </div>
 
       {/* Navigation Bar */}
