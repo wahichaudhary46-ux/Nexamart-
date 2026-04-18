@@ -5,15 +5,17 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/auth-provider";
 import { Spinner } from "@/components/ui/spinner";
-import { motion } from "framer-motion";
-import { Library, LogIn, User, Mail, Lock, ShieldCheck } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { User, Lock, Mail, UserPlus, Library, ArrowRight } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 export default function LoginPage() {
-  const { user, userProfile, loading, signIn, signInWithGoogle } = useAuth();
-  const [isSigningIn, setIsSigningIn] = useState(false);
+  const { user, userProfile, loading, signIn, signUp, signInWithGoogle } = useAuth();
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
   const router = useRouter();
 
   useEffect(() => {
@@ -26,28 +28,38 @@ export default function LoginPage() {
     }
   }, [user, userProfile, loading, router]);
 
-  const handleEmailLogin = async (e: React.FormEvent) => {
+  const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSigningIn(true);
+    setIsSubmitting(true);
     try {
-      await signIn(email, password);
+      if (isSignUp) {
+        await signUp(email, password);
+        // Note: Profile completion is handled in onboarding, 
+        // but we could store the name in state if needed.
+        toast({
+          title: "Account Created",
+          description: "Welcome to Nexa-Library! Let's complete your profile.",
+        });
+      } else {
+        await signIn(email, password);
+      }
     } catch (err: any) {
       toast({
         variant: "destructive",
-        title: "Login Failed",
-        description: "Invalid email or password. Please try again.",
+        title: isSignUp ? "Registration Failed" : "Login Failed",
+        description: err.message || "Something went wrong. Please check your credentials.",
       });
-      setIsSigningIn(false);
+      setIsSubmitting(false);
     }
   };
 
   const handleGoogleSignIn = async () => {
-    setIsSigningIn(true);
+    setIsSubmitting(true);
     try {
       await signInWithGoogle();
     } catch (err) {
       console.error(err);
-      setIsSigningIn(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -61,10 +73,10 @@ export default function LoginPage() {
 
   return (
     <div 
-      className="min-h-screen flex flex-col relative bg-cover bg-center overflow-hidden"
-      style={{ backgroundImage: "url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?q=80&w=2000&auto=format&fit=crop')" }}
+      className="min-h-screen flex flex-col relative bg-cover bg-center font-body"
+      style={{ backgroundImage: "url('https://images.unsplash.com/photo-1481627834876-b7833e8f5570?q=80&w=2000&auto=format&fit=crop')" }}
     >
-      {/* Dark Blur Overlay */}
+      {/* Dark Glassy Overlay */}
       <div className="absolute inset-0 bg-slate-900/70 backdrop-blur-md"></div>
 
       {/* Header - Nexa Library Logo */}
@@ -84,85 +96,117 @@ export default function LoginPage() {
         </div>
       </motion.div>
 
-      {/* Main Content: Login Card */}
+      {/* Main Content: Auth Card */}
       <div className="relative z-10 flex-1 flex items-center justify-center p-4">
         <motion.div 
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.1 }}
           className="w-full max-w-sm mx-auto"
         >
           {/* Glassmorphism Card */}
-          <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-[24px] shadow-2xl p-8 transition-all duration-300">
+          <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-[30px] shadow-2xl p-8 transition-all duration-500 overflow-hidden">
             
-            <div className="text-center mb-8">
-              <div className="inline-flex p-3 bg-white/5 rounded-full mb-3 border border-white/10">
-                <User className="w-8 h-8 text-blue-300" />
-              </div>
-              <h2 className="text-xs font-black text-white/90 uppercase tracking-[0.2em]">Member Login</h2>
-            </div>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={isSignUp ? "signup" : "login"}
+                initial={{ opacity: 0, x: isSignUp ? 20 : -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: isSignUp ? -20 : 20 }}
+                transition={{ duration: 0.3 }}
+                className="text-center mb-8"
+              >
+                <div className="bg-blue-600/20 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-3 border border-blue-500/30">
+                  {isSignUp ? <UserPlus className="w-8 h-8 text-blue-400" /> : <User className="w-8 h-8 text-blue-400" />}
+                </div>
+                <h2 className="text-sm font-black tracking-[0.2em] uppercase text-white/90">
+                  {isSignUp ? "Create Account" : "Member Login"}
+                </h2>
+              </motion.div>
+            </AnimatePresence>
 
-            {/* Email Login Form */}
-            <form onSubmit={handleEmailLogin} className="space-y-4">
+            {/* Auth Form */}
+            <form onSubmit={handleAuth} className="space-y-4">
+              {isSignUp && (
+                <motion.div 
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  className="relative"
+                >
+                  <User className="absolute left-3 top-3.5 w-4 h-4 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Full Name"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 text-white px-10 py-3.5 text-sm rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition-all placeholder:text-gray-500"
+                    required={isSignUp}
+                  />
+                </motion.div>
+              )}
+
               <div className="relative">
-                <Mail className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+                <Mail className="absolute left-3 top-3.5 w-4 h-4 text-gray-400" />
                 <input
                   type="email"
-                  placeholder="Email ID"
+                  placeholder="Email Address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-white/10 border border-white/20 text-white px-10 py-3 text-sm rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  className="w-full bg-white/5 border border-white/10 text-white px-10 py-3.5 text-sm rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition-all placeholder:text-gray-500"
                   required
                 />
               </div>
 
               <div className="relative">
-                <Lock className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+                <Lock className="absolute left-3 top-3.5 w-4 h-4 text-gray-400" />
                 <input
                   type="password"
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-white/10 border border-white/20 text-white px-10 py-3 text-sm rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  className="w-full bg-white/5 border border-white/10 text-white px-10 py-3.5 text-sm rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition-all placeholder:text-gray-500"
                   required
                 />
               </div>
 
               <button 
                 type="submit" 
-                disabled={isSigningIn}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all active:scale-95 disabled:opacity-50"
+                disabled={isSubmitting}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-900/40 transition-all active:scale-95 disabled:opacity-50"
               >
-                {isSigningIn ? <Spinner className="h-4 w-4 mx-auto" /> : "LOGIN"}
+                {isSubmitting ? <Spinner className="h-4 w-4 mx-auto" /> : (isSignUp ? "SIGN UP" : "LOGIN")}
               </button>
             </form>
 
             {/* Divider */}
             <div className="relative flex py-6 items-center">
               <div className="flex-grow border-t border-white/10"></div>
-              <span className="flex-shrink mx-4 text-gray-400 text-[10px] uppercase font-black tracking-widest">या</span>
+              <span className="flex-shrink mx-4 text-gray-500 text-[10px] font-black uppercase tracking-widest">OR</span>
               <div className="flex-grow border-t border-white/10"></div>
             </div>
 
-            {/* Google Login Button */}
+            {/* Google Login */}
             <button
               onClick={handleGoogleSignIn}
-              disabled={isSigningIn}
-              className="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-100 text-slate-900 font-black text-xs py-3 rounded-xl transition-all active:scale-95 disabled:opacity-70 group uppercase tracking-wider"
+              disabled={isSubmitting}
+              className="w-full flex items-center justify-center gap-3 bg-white text-gray-800 font-black text-xs py-3 rounded-xl transition-all active:scale-95 disabled:opacity-70 shadow-md group"
             >
-              <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-4 h-4" alt="Google" />
-              Sign in with Google
+              <img src="https://cdn1.iconfinder.com/data/icons/google-s-logo/150/Google_Icons-09-512.png" className="w-6 h-6" alt="Google" />
+              <span>CONTINUE WITH GOOGLE</span>
             </button>
 
-            {/* Footer */}
+            {/* Toggle Login/SignUp */}
             <div className="text-center mt-6">
-              <a href="#" className="text-white/40 hover:text-white text-[10px] font-bold italic transition-colors">
-                Forgot Password? Click to reset
-              </a>
-              <p className="text-[9px] text-white/20 font-bold uppercase tracking-[0.2em] mt-4">
-                © {new Date().getFullYear()} NexaMart Studio
-              </p>
+              <button 
+                onClick={() => setIsSignUp(!isSignUp)}
+                className="text-blue-400 hover:text-blue-300 text-[11px] font-black uppercase tracking-wider transition-colors"
+              >
+                {isSignUp ? "Already a member? Login" : "Don't have an account? Sign Up"}
+              </button>
             </div>
+            
+            <p className="text-[9px] text-white/20 font-bold uppercase tracking-[0.2em] mt-8 text-center">
+              © {new Date().getFullYear()} NexaMart Studio
+            </p>
           </div>
         </motion.div>
       </div>
