@@ -47,7 +47,6 @@ export default function AdvancedStudentProfile() {
     { id: 'B02', zone: 'Zone B', available: true, bookedBy: null },
     { id: 'C01', zone: 'Zone C', available: true, bookedBy: null },
   ]);
-  const [showSeatModal, setShowSeatModal] = useState(false);
 
   // Check-in / Check-out
   const [isCheckedIn, setIsCheckedIn] = useState(false);
@@ -68,7 +67,7 @@ export default function AdvancedStudentProfile() {
   const [seconds, setSeconds] = useState(0);
   const [currentSubject, setCurrentSubject] = useState('Physics');
   const [breakReminder, setBreakReminder] = useState(false);
-  const timerInterval = useRef<NodeJS.Timeout | null>(null);
+  const timerInterval = useRef<any>(null);
 
   useEffect(() => {
     if (isTimerRunning) {
@@ -140,7 +139,7 @@ export default function AdvancedStudentProfile() {
         <div className="flex justify-between items-start mb-6 relative z-10">
           <div className="flex gap-4 items-center">
             <div className="relative">
-              <div className="w-14 h-14 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-2xl shadow-lg flex items-center justify-center border-2 border-white/20 transform rotate-2">
+              <div className="w-14 h-14 bg-gradient-to-tr from-blue-50 to-indigo-600 rounded-2xl shadow-lg flex items-center justify-center border-2 border-white/20 transform rotate-2">
                 <span className="text-xl font-black text-white">
                   {userProfile?.fullName?.charAt(0) || "U"}
                 </span>

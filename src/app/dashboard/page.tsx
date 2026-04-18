@@ -31,7 +31,7 @@ import {
   DropdownMenuItem, 
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
-} from "@/components/ui/dropdown-menu";
+} from "@/dropdown-menu";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -81,8 +81,10 @@ export default function DashboardPage() {
   const { user, userProfile, loading, signOut } = useAuthContext();
   const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     if (!loading && !user) router.push("/login");
     if (!loading && user && !userProfile?.isProfileComplete) router.push("/onboarding");
   }, [user, userProfile, loading, router]);
@@ -92,7 +94,7 @@ export default function DashboardPage() {
     router.push("/login");
   };
 
-  if (loading || !userProfile) {
+  if (!mounted || loading || !userProfile) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Spinner className="h-6 w-6" />

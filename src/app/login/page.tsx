@@ -16,17 +16,22 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [mounted, setMounted] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && user) {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (mounted && !loading && user) {
       if (userProfile?.isProfileComplete) {
         router.push("/");
       } else {
         router.push("/onboarding");
       }
     }
-  }, [user, userProfile, loading, router]);
+  }, [user, userProfile, loading, router, mounted]);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,8 +39,6 @@ export default function LoginPage() {
     try {
       if (isSignUp) {
         await signUp(email, password);
-        // Note: Profile completion is handled in onboarding, 
-        // but we could store the name in state if needed.
         toast({
           title: "Account Created",
           description: "Welcome to Nexa-Library! Let's complete your profile.",
@@ -63,7 +66,7 @@ export default function LoginPage() {
     }
   };
 
-  if (loading) {
+  if (!mounted || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-900">
         <Spinner className="h-8 w-8 text-white" />
