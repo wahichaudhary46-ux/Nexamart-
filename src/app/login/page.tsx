@@ -1,20 +1,21 @@
+'use client';
 
-"use client";
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/components/auth-provider';
+import { Spinner } from '@/components/ui/spinner';
+import { motion } from 'framer-motion';
+import { User, Lock, Mail, UserPlus } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/components/auth-provider";
-import { Spinner } from "@/components/ui/spinner";
-import { motion, AnimatePresence } from "framer-motion";
-import { User, Lock, Mail, UserPlus, Library } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
-
-export default function LoginPage() {
-  const { user, userProfile, loading, signIn, signUp, signInWithGoogle } = useAuth();
+export default function LibraryAuth() {
+  const { auth, user, userProfile, loading } = useAuth();
   const [isSignUp, setIsSignUp] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
 
@@ -25,9 +26,9 @@ export default function LoginPage() {
   useEffect(() => {
     if (mounted && !loading && user) {
       if (userProfile?.isProfileComplete) {
-        router.push("/");
+        router.push('/');
       } else {
-        router.push("/onboarding");
+        router.push('/onboarding');
       }
     }
   }, [user, userProfile, loading, router, mounted]);
@@ -35,30 +36,31 @@ export default function LoginPage() {
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setError('');
     try {
       if (isSignUp) {
-        // Sign up now only requires email and password
-        await signUp(email, password);
+        await createUserWithEmailAndPassword(auth, email, password);
         toast({
-          title: "Account Created",
+          title: 'Account Created',
           description: "Welcome to Nexa-Library! Let's complete your profile.",
         });
-        // Redirection is handled by the useEffect once user state updates
+        router.push('/onboarding');
       } else {
-        await signIn(email, password);
-        // Redirection is handled by the useEffect
+        await signInWithEmailAndPassword(auth, email, password);
       }
     } catch (err: any) {
+      setError(err.message || 'Authentication failed');
       toast({
-        variant: "destructive",
-        title: isSignUp ? "Registration Failed" : "Login Failed",
-        description: err.message || "Something went wrong. Please check your credentials.",
+        variant: 'destructive',
+        title: isSignUp ? 'Registration Failed' : 'Login Failed',
+        description: err.message || 'Something went wrong. Please check your credentials.',
       });
       setIsSubmitting(false);
     }
   };
 
   const handleGoogleSignIn = async () => {
+    const { signInWithGoogle } = (await import('@/components/auth-provider')).useAuth();
     setIsSubmitting(true);
     try {
       await signInWithGoogle();
@@ -93,10 +95,12 @@ export default function LoginPage() {
           <div className="bg-blue-600/20 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-3 border border-blue-500/30">
             {isSignUp ? <UserPlus className="w-8 h-8 text-blue-400" /> : <User className="w-8 h-8 text-blue-400" />}
           </div>
-          <h2 className="text-sm font-black tracking-[0.2em] uppercase text-white">
+          <h2 className="text-sm font-black tracking-[0.2em] uppercase">
             {isSignUp ? "Create Account" : "Member Login"}
           </h2>
         </div>
+
+        {error && <p className="text-red-400 text-[11px] text-center mb-4 bg-red-900/30 py-2 rounded-lg border border-red-500/20">{error}</p>}
 
         <form onSubmit={handleAuth} className="space-y-4">
           <div className="relative">
@@ -104,9 +108,9 @@ export default function LoginPage() {
             <input
               type="email"
               placeholder="Email Address"
+              className="w-full bg-white/5 border border-white/10 text-white px-10 py-3.5 text-sm rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition-all placeholder:text-gray-500"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 text-white px-10 py-3.5 text-sm rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition-all placeholder:text-gray-500"
               required
             />
           </div>
@@ -116,9 +120,9 @@ export default function LoginPage() {
             <input
               type="password"
               placeholder="Password"
+              className="w-full bg-white/5 border border-white/10 text-white px-10 py-3.5 text-sm rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition-all placeholder:text-gray-500"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 text-white px-10 py-3.5 text-sm rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition-all placeholder:text-gray-500"
               required
             />
           </div>
@@ -156,6 +160,6 @@ export default function LoginPage() {
           </button>
         </div>
       </motion.div>
-    </motion.div>
+    </div>
   );
 }
