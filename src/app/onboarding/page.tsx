@@ -9,12 +9,11 @@ import { Spinner } from "@/components/ui/spinner";
 import { motion, AnimatePresence } from "framer-motion";
 import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { useFirestore } from "@/firebase";
-import { Camera, Book, GraduationCap, MapPin, User, ChevronRight, ArrowLeft } from "lucide-react";
-import { errorEmitter } from "@/firebase/error-emitter";
-import { FirestorePermissionError } from "@/firebase/errors";
+import { Camera, Book, GraduationCap, MapPin, User, ChevronRight, ArrowLeft, Sparkles } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
 export default function OnboardingPage() {
-  const { user, userProfile, loading, signOut } = useAuth();
+  const { user, userProfile, loading } = useAuth();
   const db = useFirestore();
   const router = useRouter();
   const [step, setStep] = useState(1);
@@ -36,10 +35,14 @@ export default function OnboardingPage() {
   });
 
   useEffect(() => {
-    if (!loading && !user) router.push("/login");
-    if (!loading && user && userProfile?.isProfileComplete) router.push("/");
+    if (!loading && !user) {
+      router.push("/login");
+    }
+    if (!loading && user && userProfile?.isProfileComplete) {
+      router.push("/");
+    }
     
-    if (userProfile) {
+    if (userProfile && !formData.fullName) {
       setFormData(prev => ({
         ...prev,
         fullName: userProfile.fullName || "",
@@ -56,56 +59,57 @@ export default function OnboardingPage() {
     if (!user) return;
     setSaving(true);
     
-    const userRef = doc(db, "users", user.uid);
-    const updateData = {
-      ...formData,
-      isProfileComplete: true,
-      updatedAt: serverTimestamp(),
-    };
+    try {
+      const userRef = doc(db, "users", user.uid);
+      const updateData = {
+        ...formData,
+        isProfileComplete: true,
+        updatedAt: serverTimestamp(),
+      };
 
-    updateDoc(userRef, updateData)
-      .then(() => {
-        router.push("/");
-      })
-      .catch(async (error: any) => {
-        if (error.code === 'permission-denied') {
-          const permissionError = new FirestorePermissionError({
-            path: userRef.path,
-            operation: 'update',
-            requestResourceData: updateData,
-          });
-          errorEmitter.emit('permission-error', permissionError);
-        }
-      })
-      .finally(() => {
-        setSaving(false);
+      await updateDoc(userRef, updateData);
+      toast({
+        title: "Profile Completed",
+        description: "Welcome to Nexa-Library! Your portal is ready.",
       });
+      router.push("/");
+    } catch (error: any) {
+      console.error("Error saving profile:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Could not save your profile. Please try again.",
+      });
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (loading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-900">
-        <Spinner className="h-8 w-8 text-blue-500" />
+      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-900 text-white">
+        <Spinner className="h-10 w-10 text-blue-500 mb-4" />
+        <p className="text-sm font-black tracking-widest uppercase opacity-50">Checking Session...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white font-body selection:bg-blue-500/30 overflow-x-hidden">
-      {/* Background Glows */}
+    <div className="min-h-screen bg-slate-900 text-white font-body selection:bg-blue-500/30 overflow-x-hidden relative">
+      {/* Background Mesh Glows */}
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-[100px]" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-indigo-600/10 rounded-full blur-[100px]" />
+        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[120px]" />
+        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[120px]" />
       </div>
 
-      <div className="relative z-10 max-w-md mx-auto px-6 pt-10 pb-20">
+      <div className="relative z-10 max-w-md mx-auto px-6 pt-12 pb-20">
         
         {/* Step Indicator */}
-        <div className="flex justify-between items-center mb-10 gap-2">
+        <div className="flex justify-between items-center mb-12 gap-3">
           {[1, 2, 3].map((s) => (
             <div 
               key={s} 
-              className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${step >= s ? 'bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]' : 'bg-slate-800'}`} 
+              className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${step >= s ? 'bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.5)]' : 'bg-slate-800'}`} 
             />
           ))}
         </div>
@@ -117,70 +121,76 @@ export default function OnboardingPage() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              className="space-y-6"
+              className="space-y-8"
             >
               <header>
-                <h2 className="text-3xl font-black tracking-tight mb-2">Personal Details 👤</h2>
-                <p className="text-slate-400 text-sm">Let's start with the basics.</p>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 mb-4">
+                  <Sparkles className="w-3.5 h-3.5 text-blue-400" />
+                  <span className="text-[10px] font-black uppercase tracking-widest text-blue-400">Step 01 / 03</span>
+                </div>
+                <h2 className="text-3xl font-black tracking-tight mb-2">Your Identity 👤</h2>
+                <p className="text-slate-400 text-sm">Let's set up your member profile.</p>
               </header>
 
               <div className="flex flex-col items-center">
-                <div className="w-24 h-24 bg-slate-800 rounded-3xl border-2 border-dashed border-slate-700 flex items-center justify-center relative overflow-hidden group hover:border-blue-500 transition-colors cursor-pointer">
+                <div className="w-24 h-24 bg-slate-800 rounded-[2rem] border-2 border-dashed border-slate-700 flex items-center justify-center relative overflow-hidden group hover:border-blue-500 transition-all cursor-pointer shadow-2xl">
                   {formData.photoURL ? (
                     <img src={formData.photoURL} className="w-full h-full object-cover" alt="Profile" />
                   ) : (
                     <Camera className="w-8 h-8 text-slate-500 group-hover:text-blue-400 transition-colors" />
                   )}
                 </div>
-                <p className="text-[10px] mt-3 text-orange-400 font-bold uppercase tracking-widest text-center px-4">
-                  ⚠️ Profile & Name can be updated once a year!
-                </p>
+                <div className="mt-4 p-3 bg-orange-500/10 border border-orange-500/20 rounded-xl max-w-[280px]">
+                  <p className="text-[10px] text-orange-400 font-bold uppercase tracking-widest text-center leading-relaxed">
+                    ⚠️ Profile & Name can be updated only once a year!
+                  </p>
+                </div>
               </div>
 
-              <div className="space-y-4">
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black uppercase text-slate-500 ml-1">Full Name</label>
+              <div className="space-y-5">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black uppercase text-slate-500 ml-1 tracking-widest">Full Name</label>
                   <input 
                     type="text" 
                     placeholder="e.g. Rahul Sharma" 
                     value={formData.fullName}
                     onChange={(e) => setFormData({...formData, fullName: e.target.value})}
-                    className="w-full bg-slate-800/50 border border-slate-700 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-slate-600"
+                    className="w-full bg-slate-800/50 border border-slate-700 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all placeholder:text-slate-600 font-medium"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-black uppercase text-slate-500 ml-1">Birth Date</label>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black uppercase text-slate-500 ml-1 tracking-widest">Birth Date</label>
                     <input 
                       type="date" 
                       value={formData.dob}
                       onChange={(e) => setFormData({...formData, dob: e.target.value})}
-                      className="w-full bg-slate-800/50 border border-slate-700 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm" 
+                      className="w-full bg-slate-800/50 border border-slate-700 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm font-medium" 
                     />
                   </div>
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-black uppercase text-slate-500 ml-1">Gender</label>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-black uppercase text-slate-500 ml-1 tracking-widest">Gender</label>
                     <select 
                       value={formData.gender}
                       onChange={(e) => setFormData({...formData, gender: e.target.value})}
-                      className="w-full bg-slate-800/50 border border-slate-700 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm appearance-none"
+                      className="w-full bg-slate-800/50 border border-slate-700 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm appearance-none font-medium"
                     >
-                      <option value="">Select</option>
-                      <option value="Male">Male</option>
-                      <option value="Female">Female</option>
-                      <option value="Other">Other</option>
+                      <option value="" className="bg-slate-900">Select</option>
+                      <option value="Male" className="bg-slate-900">Male</option>
+                      <option value="Female" className="bg-slate-900">Female</option>
+                      <option value="Other" className="bg-slate-900">Other</option>
                     </select>
                   </div>
                 </div>
 
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black uppercase text-slate-500 ml-1">Your Bio</label>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black uppercase text-slate-500 ml-1 tracking-widest">Short Bio</label>
                   <textarea 
-                    placeholder="A brief description about yourself..." 
+                    placeholder="A brief sentence about your academic goals..." 
                     value={formData.bio}
                     onChange={(e) => setFormData({...formData, bio: e.target.value})}
-                    className="w-full bg-slate-800/50 border border-slate-700 p-4 rounded-2xl h-24 outline-none focus:ring-2 focus:ring-blue-500 transition-all placeholder:text-slate-600 resize-none" 
+                    className="w-full bg-slate-800/50 border border-slate-700 p-4 rounded-2xl h-24 outline-none focus:ring-2 focus:ring-blue-500 transition-all placeholder:text-slate-600 resize-none text-sm font-medium" 
                   />
                 </div>
               </div>
@@ -188,10 +198,14 @@ export default function OnboardingPage() {
               <Button 
                 onClick={handleNext} 
                 disabled={!formData.fullName}
-                className="w-full h-14 bg-blue-600 hover:bg-blue-700 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-900/40 disabled:opacity-50"
+                className="w-full h-16 bg-blue-600 hover:bg-blue-700 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-blue-900/40 disabled:opacity-50 transition-all active:scale-95"
               >
-                Next Step <ChevronRight className="ml-2 w-4 h-4" />
+                Continue to Education <ChevronRight className="ml-2 w-4 h-4" />
               </Button>
+              
+              <p className="text-[9px] text-slate-600 text-center uppercase font-bold tracking-[0.2em]">
+                Galti hone par Library Office se contact karein
+              </p>
             </motion.div>
           )}
 
@@ -201,66 +215,70 @@ export default function OnboardingPage() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              className="space-y-6"
+              className="space-y-8"
             >
               <header>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 mb-4">
+                  <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+                  <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400">Step 02 / 03</span>
+                </div>
                 <h2 className="text-3xl font-black tracking-tight mb-2">Education 📚</h2>
-                <p className="text-slate-400 text-sm">Help us personalize your study experience.</p>
+                <p className="text-slate-400 text-sm">Class select karte hi aapko usi ka material dikhega.</p>
               </header>
 
-              <div className="space-y-4">
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black uppercase text-slate-500 ml-1">Select Class / Level</label>
+              <div className="space-y-5">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black uppercase text-slate-500 ml-1 tracking-widest">Class / Level</label>
                   <select 
                     value={formData.class}
                     onChange={(e) => setFormData({...formData, class: e.target.value})}
-                    className="w-full bg-slate-800/50 border border-slate-700 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm appearance-none"
+                    className="w-full bg-slate-800/50 border border-slate-700 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm appearance-none font-medium"
                   >
-                    <option value="">Select Level</option>
-                    <option value="Class 9">Class 9</option>
-                    <option value="Class 10">Class 10</option>
-                    <option value="Class 11">Class 11</option>
-                    <option value="Class 12">Class 12</option>
-                    <option value="JEE">JEE Aspirant</option>
-                    <option value="NEET">NEET Aspirant</option>
-                    <option value="UPSC">UPSC</option>
+                    <option value="" className="bg-slate-900">Select Level</option>
+                    <option value="Class 9" className="bg-slate-900">Class 9</option>
+                    <option value="Class 10" className="bg-slate-900">Class 10</option>
+                    <option value="Class 11" className="bg-slate-900">Class 11</option>
+                    <option value="Class 12" className="bg-slate-900">Class 12</option>
+                    <option value="JEE" className="bg-slate-900">JEE Aspirant</option>
+                    <option value="NEET" className="bg-slate-900">NEET Aspirant</option>
+                    <option value="UPSC" className="bg-slate-900">UPSC</option>
                   </select>
                 </div>
 
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black uppercase text-slate-500 ml-1">Target Exam</label>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black uppercase text-slate-500 ml-1 tracking-widest">Target Exam</label>
                   <input 
                     type="text" 
                     placeholder="e.g. CBSE 2026 or JEE Advanced" 
                     value={formData.exam}
                     onChange={(e) => setFormData({...formData, exam: e.target.value})}
-                    className="w-full bg-slate-800/50 border border-slate-700 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all placeholder:text-slate-600" 
+                    className="w-full bg-slate-800/50 border border-slate-700 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all placeholder:text-slate-600 font-medium" 
                   />
                 </div>
 
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black uppercase text-slate-500 ml-1">Stream</label>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black uppercase text-slate-500 ml-1 tracking-widest">Stream</label>
                   <select 
                     value={formData.stream}
                     onChange={(e) => setFormData({...formData, stream: e.target.value})}
-                    className="w-full bg-slate-800/50 border border-slate-700 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm appearance-none"
+                    className="w-full bg-slate-800/50 border border-slate-700 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm appearance-none font-medium"
                   >
-                    <option value="">Select Stream</option>
-                    <option value="Science">Science</option>
-                    <option value="Commerce">Commerce</option>
-                    <option value="Arts">Arts</option>
-                    <option value="General">General</option>
+                    <option value="" className="bg-slate-900">Select Stream</option>
+                    <option value="Science" className="bg-slate-900">Science</option>
+                    <option value="Commerce" className="bg-slate-900">Commerce</option>
+                    <option value="Arts" className="bg-slate-900">Arts</option>
+                    <option value="General" className="bg-slate-900">General</option>
                   </select>
                 </div>
 
-                <div className="bg-blue-600/10 p-5 rounded-2xl border border-blue-500/30 flex items-start gap-4">
-                  <div className="bg-blue-500/20 p-2 rounded-xl">
+                <div className="bg-blue-600/10 p-6 rounded-[2rem] border border-blue-500/30 flex items-start gap-4 shadow-inner">
+                  <div className="bg-blue-500/20 p-2.5 rounded-xl shrink-0">
                     <GraduationCap className="w-5 h-5 text-blue-400" />
                   </div>
                   <div>
-                    <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Admission Number</p>
-                    <p className="text-lg font-mono font-black">{formData.admissionNo}</p>
-                    <p className="text-[9px] text-slate-400 mt-1 uppercase">Generated by Admin for full access</p>
+                    <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-1">Generated Admission ID</p>
+                    <p className="text-xl font-mono font-black tracking-wider text-white">{formData.admissionNo}</p>
+                    <p className="text-[9px] text-slate-500 mt-1 uppercase font-bold">Admin will verify this for full access</p>
                   </div>
                 </div>
               </div>
@@ -269,15 +287,16 @@ export default function OnboardingPage() {
                 <Button 
                   onClick={handleBack} 
                   variant="outline"
-                  className="flex-1 h-14 bg-transparent border-slate-700 text-slate-300 rounded-2xl font-black text-xs uppercase tracking-widest"
+                  className="flex-1 h-16 bg-transparent border-slate-700 text-slate-300 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-800"
                 >
                   <ArrowLeft className="mr-2 w-4 h-4" /> Back
                 </Button>
                 <Button 
                   onClick={handleNext} 
-                  className="flex-1 h-14 bg-blue-600 hover:bg-blue-700 rounded-2xl font-black text-xs uppercase tracking-widest"
+                  disabled={!formData.class}
+                  className="flex-1 h-16 bg-blue-600 hover:bg-blue-700 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-900/40 disabled:opacity-50"
                 >
-                  Next <ChevronRight className="ml-2 w-4 h-4" />
+                  Location <ChevronRight className="ml-2 w-4 h-4" />
                 </Button>
               </div>
             </motion.div>
@@ -289,79 +308,73 @@ export default function OnboardingPage() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              className="space-y-6"
+              className="space-y-8"
             >
               <header>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-4">
+                  <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+                  <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">Step 03 / 03</span>
+                </div>
                 <h2 className="text-3xl font-black tracking-tight mb-2">Location 📍</h2>
                 <p className="text-slate-400 text-sm">Where are you studying from?</p>
               </header>
 
-              <div className="space-y-4">
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black uppercase text-slate-500 ml-1">City</label>
+              <div className="space-y-5">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black uppercase text-slate-500 ml-1 tracking-widest">City</label>
                   <input 
                     type="text" 
                     placeholder="e.g. Nawada" 
                     value={formData.city}
                     onChange={(e) => setFormData({...formData, city: e.target.value})}
-                    className="w-full bg-slate-800/50 border border-slate-700 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all placeholder:text-slate-600" 
+                    className="w-full bg-slate-800/50 border border-slate-700 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all placeholder:text-slate-600 font-medium" 
                   />
                 </div>
                 
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black uppercase text-slate-500 ml-1">State</label>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black uppercase text-slate-500 ml-1 tracking-widest">State</label>
                   <input 
                     type="text" 
                     placeholder="e.g. Bihar" 
                     value={formData.state}
                     onChange={(e) => setFormData({...formData, state: e.target.value})}
-                    className="w-full bg-slate-800/50 border border-slate-700 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all placeholder:text-slate-600" 
+                    className="w-full bg-slate-800/50 border border-slate-700 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all placeholder:text-slate-600 font-medium" 
                   />
                 </div>
 
-                <div className="space-y-1 opacity-60">
-                  <label className="text-[10px] font-black uppercase text-slate-500 ml-1">Country</label>
+                <div className="space-y-1.5 opacity-60">
+                  <label className="text-[10px] font-black uppercase text-slate-500 ml-1 tracking-widest">Country</label>
                   <input 
                     type="text" 
                     value={formData.country} 
                     readOnly 
-                    className="w-full bg-slate-900 border border-slate-800 p-4 rounded-2xl text-slate-500 outline-none" 
+                    className="w-full bg-slate-900 border border-slate-800 p-4 rounded-2xl text-slate-500 outline-none font-medium" 
                   />
                 </div>
               </div>
 
-              <div className="pt-4 space-y-4">
+              <div className="pt-6 space-y-4">
                 <Button 
                   onClick={handleSubmit} 
                   disabled={saving || !formData.city || !formData.state}
-                  className="w-full h-16 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-2xl font-black text-lg uppercase tracking-widest shadow-xl shadow-green-900/30 disabled:opacity-50"
+                  className="w-full h-18 bg-gradient-to-br from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-[2rem] font-black text-lg uppercase tracking-widest shadow-2xl shadow-green-900/40 disabled:opacity-50 transition-all active:scale-95"
                 >
                   {saving ? <Spinner className="h-6 w-6" /> : "Finish & Start Studying 🍯"}
                 </Button>
                 <button 
                   onClick={handleBack} 
-                  className="w-full text-slate-500 hover:text-white transition-colors font-black text-[10px] uppercase tracking-widest"
+                  className="w-full text-slate-500 hover:text-white transition-colors font-black text-[10px] uppercase tracking-[0.3em]"
                 >
                   Back to Education
                 </button>
               </div>
 
-              <p className="text-[10px] text-slate-500 text-center uppercase font-bold tracking-widest mt-10">
-                Contact Library Office for corrections
+              <p className="text-[10px] text-slate-700 text-center uppercase font-bold tracking-widest mt-12 leading-relaxed">
+                By finishing, you agree to our Digital Library Terms.<br/>Your IP is logged for security.
               </p>
             </motion.div>
           )}
         </AnimatePresence>
-
-        {/* Auth Helper Sign Out */}
-        <div className="mt-20 text-center">
-          <button 
-            onClick={signOut} 
-            className="text-[10px] font-black text-slate-700 hover:text-red-500 transition-colors uppercase tracking-[0.3em]"
-          >
-            ← Exit Session
-          </button>
-        </div>
       </div>
     </div>
   );
