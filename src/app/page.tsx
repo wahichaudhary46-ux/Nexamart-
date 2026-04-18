@@ -1,296 +1,148 @@
-
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Link from "next/link";
 import { 
   Search, 
-  MapPin, 
+  BookOpen, 
+  Download, 
+  Library, 
+  ArrowRight, 
+  Bookmark, 
+  Sparkles, 
+  TrendingUp,
   Home,
-  BookOpen,
   Compass,
   BrainCircuit,
-  User,
-  Bell,
-  ChevronRight,
-  Check,
-  ShoppingBag,
-  Zap,
-  Star,
-  Cpu,
-  Shirt,
-  Cookie
+  User
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 import { motion } from "framer-motion";
 
-const NAWADA_CITIES = [
-  "Nawada City",
-  "Nardiganj",
-  "Hisua",
-  "Warsaliganj",
-  "Rajauli",
-  "Akbarpur",
-  "Meskaur",
-  "Pakribarwan"
-];
-
-const PRIMARY_LOCATIONS = [
-  { id: "nardiganj", name: "Nardiganj", description: "Old Bazar Hub" },
-  { id: "nawada", name: "Nawada", description: "Main City Area" },
-  { id: "hisua", name: "Hisua", description: "Town Market" }
-];
-
-const CATEGORIES = [
-  { name: "Notes", icon: BookOpen, color: "from-amber-400 to-orange-600" },
-  { name: "Gadgets", icon: Cpu, color: "from-blue-400 to-indigo-600" },
-  { name: "Fashion", icon: Shirt, color: "from-rose-400 to-purple-600" },
-  { name: "Live", icon: Zap, color: "from-emerald-400 to-teal-600" },
-  { name: "Home", icon: Home, color: "from-cyan-400 to-blue-600" }
-];
-
-const SHOPS = [
-  { id: 1, name: "Nardiganj Study Hub", city: "Nardiganj", rating: 4.8, status: "Live: New Math Notes" },
-  { id: 2, name: "Gupta Stationery", city: "Nardiganj", rating: 4.5, status: "Offers on Pens" },
-  { id: 3, name: "Hisua Electronics", city: "Hisua", rating: 4.9, status: "New Tablet Launch" },
-  { id: 4, name: "Nawada Fashion", city: "Nawada", rating: 4.2, status: "End of Season Sale" }
-];
-
-export default function NextGenDashboard() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCity, setSelectedCity] = useState("Nardiganj");
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [pinCode, setPinCode] = useState("");
-
-  useEffect(() => {
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          try {
-            const { latitude, longitude } = position.coords;
-            const res = await fetch(
-              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
-            );
-            const data = await res.json();
-            const addr = data.address;
-            const city = addr.city || addr.town || addr.village || addr.suburb || "Nawada City";
-            const code = addr.postcode || "";
-            
-            setPinCode(code);
-            const matchedCity = PRIMARY_LOCATIONS.find(loc => city.includes(loc.name));
-            if (matchedCity) setSelectedCity(matchedCity.name);
-          } catch (error) {
-            console.error("Location lookup failed:", error);
-          }
-        }
-      );
-    }
-  }, []);
-
+export default function NexaLibraryDashboard() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/40 to-slate-100 flex flex-col pb-32 font-body transition-colors duration-500 overflow-x-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50/30 to-blue-50/40 font-body pb-32 overflow-x-hidden">
       
-      {/* Navbar - Compact & Glass */}
-      <nav className="flex items-center justify-between gap-2 px-3 py-2 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md w-full border-b border-white/20 sticky top-0 z-50 shadow-sm transition-all duration-300">
-        <div className="flex-shrink-0">
-          <Link href="/">
-            <span className="text-xl font-black text-blue-700 dark:text-blue-400 tracking-tighter">
-              StudyHub
-            </span>
-          </Link>
-        </div>
-
-        <div className="flex-1 mx-1">
-          <div className="relative group">
-            <input
-              type="text"
-              placeholder={`Search in ${selectedCity}...`}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-10 pl-10 pr-3 rounded-full border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-gray-800 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all shadow-inner"
-            />
-            <Search className="absolute left-3.5 top-3 h-4 w-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
-          </div>
-        </div>
-
-        <div className="flex-shrink-0 flex items-center">
-          <button className="relative p-1.5 hover:bg-slate-100 dark:hover:bg-gray-800 rounded-full transition-colors">
-            <Bell className="h-5 w-5 text-slate-600 dark:text-slate-400" />
-            <span className="absolute top-1 right-1 block h-2 w-2 rounded-full bg-rose-500 ring-2 ring-white dark:ring-gray-900"></span>
-          </button>
-        </div>
-      </nav>
-
-      {/* Location Bar - Compact Glass */}
-      <div className="w-full bg-white/40 backdrop-blur-sm border-b border-white/20">
-        <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
-          <div className="flex items-center gap-1.5 text-[11px] text-slate-600 font-bold truncate">
-            <MapPin className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-            <span className="truncate">
-              {selectedCity} {pinCode && `- ${pinCode}`}
-            </span>
-          </div>
-          
-          <Sheet open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-            <SheetTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="h-7 text-[10px] font-black text-blue-600 hover:bg-blue-50 px-2 flex items-center gap-0.5 rounded-full"
-              >
-                Change
-                <ChevronRight className="w-3 h-3" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="bottom" className="rounded-t-[40px] h-[60vh] p-0 border-t-0 shadow-[0_-10px_40px_rgba(0,0,0,0.1)]">
-              <SheetHeader className="p-6 border-b border-slate-100">
-                <SheetTitle className="text-lg font-black text-center tracking-tight">Select Study Area</SheetTitle>
-              </SheetHeader>
-              <div className="overflow-y-auto h-full pb-20 p-4 space-y-2">
-                {NAWADA_CITIES.map((city) => (
-                  <button
-                    key={city}
-                    onClick={() => {
-                      setSelectedCity(city);
-                      setIsDrawerOpen(false);
-                    }}
-                    className={`w-full flex items-center justify-between p-4 rounded-[24px] transition-all duration-300 ${
-                      selectedCity.includes(city)
-                        ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30 scale-[1.02]" 
-                        : "bg-slate-50 hover:bg-slate-100 text-slate-700"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-full ${selectedCity.includes(city) ? "bg-white/20" : "bg-white shadow-sm"}`}>
-                        <MapPin className="w-4 h-4" />
-                      </div>
-                      <span className="text-sm font-bold">{city}</span>
-                    </div>
-                    {selectedCity.includes(city) && <Check className="w-4 h-4" />}
-                  </button>
-                ))}
-              </div>
-            </SheetContent>
-          </Sheet>
-        </div>
+      {/* 3D Animated Background Elements */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-20 -left-20 w-72 h-72 bg-blue-300/20 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-20 -right-20 w-96 h-96 bg-indigo-300/20 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/3 left-1/4 w-48 h-48 bg-purple-300/10 rounded-full blur-2xl animate-float"></div>
+        <div className="absolute bottom-1/3 right-1/4 w-64 h-64 bg-cyan-300/10 rounded-full blur-2xl animate-float-delayed"></div>
       </div>
 
-      {/* MAIN DASHBOARD */}
-      <main className="flex-1 w-full px-4 py-6 space-y-8 overflow-x-hidden">
-        
-        {/* 1. Local Live Radar (Smart Island) */}
-        <div className="mx-1 py-2.5 px-4 bg-black/85 backdrop-blur-xl border border-white/10 rounded-full flex items-center gap-3 shadow-[0_8px_32px_rgba(0,0,0,0.2),0_0_20px_rgba(59,130,246,0.4)] relative group overflow-hidden">
-          <div className="relative shrink-0">
-            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_12px_#10b981]" />
+      {/* 1. Header & Greeting with 3D Perspective */}
+      <div className="relative perspective-1000">
+        <div className="bg-gradient-to-br from-[#1a2a3f] via-[#1e2e46] to-[#16212e] px-6 py-8 rounded-b-[40px] shadow-2xl text-white relative z-10 border-b border-white/10">
+          {/* 3D Floating Shapes in Header */}
+          <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full blur-2xl transform rotate-12 -translate-y-1/2 translate-x-1/2"></div>
+          <div className="absolute bottom-0 left-10 w-24 h-24 bg-blue-500/10 rounded-full blur-xl transform -translate-y-1/2"></div>
+          
+          <div className="flex justify-between items-center mb-6 relative z-10">
+            <div className="flex items-center gap-2 transform-gpu transition-all duration-300 hover:scale-105">
+              <div className="relative">
+                <Library className="w-7 h-7 text-blue-400 drop-shadow-lg" />
+                <Sparkles className="w-3 h-3 text-yellow-300 absolute -top-1 -right-1" />
+              </div>
+              <h1 className="text-2xl font-black tracking-tight bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent drop-shadow-md">Nexa-Library</h1>
+            </div>
+            <div className="w-10 h-10 bg-gradient-to-br from-white/20 to-white/5 rounded-full flex items-center justify-center backdrop-blur-sm border border-white/30 shadow-lg transform transition-all duration-300 hover:rotate-12 hover:scale-110 cursor-pointer">
+              <span className="text-sm font-bold">AK</span>
+            </div>
           </div>
           
-          <div className="flex-1 overflow-hidden">
-            <div className="flex whitespace-nowrap animate-marquee">
-              <span className="text-[11px] font-black uppercase tracking-[0.2em] text-white pr-20">
-                Live: Class 10th Math Notes uploaded at Study Hub • New Quiz: Science Chapter 1 • 20% Off at Gupta Stationery • 
-              </span>
-              <span className="text-[11px] font-black uppercase tracking-[0.2em] text-white pr-20">
-                Live: Class 10th Math Notes uploaded at Study Hub • New Quiz: Science Chapter 1 • 20% Off at Gupta Stationery • 
-              </span>
+          <div className="relative z-10">
+            <h2 className="text-3xl font-black mb-1 bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent animate-gradient-x">Hello, Student! 👋</h2>
+            <p className="text-sm text-blue-200 mb-6 opacity-90 flex items-center gap-1">
+              <TrendingUp className="w-4 h-4" /> What do you want to learn today?
+            </p>
+          </div>
+
+          {/* 2. 3D Search Bar with Depth */}
+          <div className="relative max-w-md mx-auto transform translate-y-4 group perspective-500">
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-2xl blur opacity-30 group-hover:opacity-75 transition duration-500"></div>
+            <div className="relative transform transition-all duration-300 group-hover:translate-y-[-2px] group-hover:rotate-x-2">
+              <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none z-10">
+                <Search className="h-5 w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
+              </div>
+              <input
+                type="text"
+                className="w-full bg-white/90 backdrop-blur-sm text-gray-800 rounded-2xl py-4 pl-12 pr-4 shadow-[0_20px_35px_-10px_rgba(0,0,0,0.2)] border border-white/50 focus:outline-none focus:ring-4 focus:ring-blue-300/50 text-sm font-bold transition-all duration-300"
+                placeholder="Search books, authors, or notes..."
+              />
             </div>
           </div>
         </div>
+      </div>
 
-        {/* 2. 3D Floating Orbs (Categories) */}
-        <section>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xs font-black uppercase tracking-[0.3em] text-slate-400">Hub Categories</h2>
-          </div>
-          
-          <div className="flex gap-5 overflow-x-auto no-scrollbar pb-4 pt-2 -mx-4 px-4">
-            {CATEGORIES.map((cat, idx) => (
-              <motion.button
-                key={cat.name}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.1 }}
-                className="flex flex-col items-center gap-3 shrink-0 group"
-              >
-                <div className={`
-                  w-16 h-16 rounded-full bg-gradient-to-br ${cat.color} 
-                  shadow-[inset_0_-8px_16px_rgba(0,0,0,0.3),0_12px_24px_rgba(0,0,0,0.15)]
-                  flex items-center justify-center animate-float relative
-                `} style={{ animationDelay: `${idx * 0.5}s` }}>
-                  <cat.icon className="w-7 h-7 text-white drop-shadow-xl" />
-                  <div className="absolute inset-0 rounded-full border border-white/20" />
-                </div>
-                <span className="text-[10px] font-black uppercase tracking-tighter text-slate-500 group-hover:text-blue-600 transition-colors">
-                  {cat.name}
-                </span>
-              </motion.button>
-            ))}
-          </div>
-        </section>
+      {/* 3. Study Categories (3D Orbs/Pills with Tilt) */}
+      <div className="px-6 mt-14 mb-8 relative z-10">
+        <h3 className="text-xs font-black text-gray-400 mb-4 flex items-center gap-2 uppercase tracking-[0.3em]">
+          <div className="p-1 bg-blue-100 rounded-lg">
+            <BookOpen className="w-4 h-4 text-blue-600" />
+          </div> Categories
+        </h3>
+        
+        <div className="flex gap-3 overflow-x-auto no-scrollbar pb-4 pt-2 perspective-500">
+          {['Class 10', 'Class 12', 'JEE/NEET', 'Novels', 'PYQs'].map((category, index) => (
+            <button 
+              key={index} 
+              className="flex-shrink-0 bg-white/80 backdrop-blur-sm border border-gray-100 rounded-xl px-5 py-2.5 shadow-md hover:shadow-xl transition-all duration-300 text-xs font-black text-slate-500 hover:text-blue-600 transform-gpu hover:translate-y-[-3px] hover:rotate-x-3 hover:scale-105"
+            >
+              {category}
+            </button>
+          ))}
+        </div>
+      </div>
 
-        {/* 3. 3D Glassmorphism Storefronts */}
-        <section className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xs font-black uppercase tracking-[0.3em] text-slate-400">Best In {selectedCity}</h2>
-            <Link href="#" className="text-[10px] font-black text-blue-600 uppercase tracking-widest">See All</Link>
-          </div>
-
-          <div className="flex gap-5 overflow-x-auto no-scrollbar pb-10 -mx-4 px-4 pt-2">
-            {SHOPS.filter(s => s.city === selectedCity).map((shop, idx) => (
-              <motion.div
-                key={shop.id}
-                initial={{ opacity: 0, x: 50 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: idx * 0.15 }}
-                className="shrink-0 w-64 group"
-              >
-                <div className="relative h-80 bg-white/40 backdrop-blur-2xl border border-white/50 shadow-[0_20px_50px_rgba(0,0,0,0.1)] rounded-[40px] p-6 flex flex-col justify-between overflow-hidden transition-all duration-700 hover:rotate-y-12 hover:scale-[1.05] perspective-1000">
-                  
-                  <div className="absolute -top-10 -right-10 w-32 h-32 bg-blue-400/10 rounded-full blur-3xl group-hover:bg-blue-400/20 transition-all" />
-                  
-                  <div>
-                    <div className="flex justify-between items-start mb-4 relative z-10">
-                      <div className="bg-white/60 p-3 rounded-2xl shadow-sm">
-                        <ShoppingBag className="w-5 h-5 text-blue-600" />
-                      </div>
-                      <div className="flex items-center gap-1 bg-white/60 backdrop-blur-md px-2.5 py-1 rounded-full shadow-sm">
-                        <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
-                        <span className="text-[10px] font-black">{shop.rating}</span>
-                      </div>
-                    </div>
-                    
-                    <h3 className="text-xl font-black text-slate-900 tracking-tight leading-tight mb-1 relative z-10">
-                      {shop.name}
-                    </h3>
-                    <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest relative z-10">
-                      {shop.city} Study Area
-                    </p>
-                  </div>
-
-                  <div className="relative z-10">
-                    <div className="bg-blue-50/50 rounded-2xl p-3 mb-4 border border-blue-100/30">
-                      <p className="text-[10px] font-black text-blue-700 uppercase leading-none mb-1">Status Update</p>
-                      <p className="text-xs font-bold text-slate-700 line-clamp-1">{shop.status}</p>
-                    </div>
-                    
-                    <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl h-11 shadow-lg shadow-blue-500/20 transition-all group-hover:shadow-blue-500/40">
-                      VISIT HUB
-                    </Button>
-                  </div>
-
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </section>
-
-      </main>
+      {/* 4. Trending Books Section with 3D Glassmorphism Cards */}
+      <div className="px-6 relative z-10">
+        <div className="flex justify-between items-center mb-5">
+          <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.3em] flex items-center gap-2">
+            <div className="bg-orange-100 p-1 rounded-lg">
+              <TrendingUp className="w-4 h-4 text-orange-500" />
+            </div>
+            Trending Reads
+          </h3>
+          <span className="text-[10px] font-black text-blue-600 cursor-pointer flex items-center gap-1 transition-all duration-300 hover:translate-x-1">
+            VIEW ALL <ArrowRight className="w-3 h-3" />
+          </span>
+        </div>
+        
+        <div className="grid grid-cols-2 gap-5 perspective-1000 mb-10">
+          {[1, 2, 3, 4].map((book) => (
+            <div 
+              key={book} 
+              className="group relative bg-white/90 backdrop-blur-sm rounded-3xl p-3 shadow-xl transition-all duration-500 ease-out hover:shadow-2xl border border-white/50 hover:border-blue-200/50 transform-gpu hover:translate-y-[-8px] hover:rotate-x-6 hover:rotate-y-6"
+            >
+              {/* 3D Bookmark Icon */}
+              <button className="absolute top-3 right-3 bg-white/90 p-1.5 rounded-full backdrop-blur-md shadow-md text-gray-300 hover:text-blue-600 transition-all duration-300 z-10 transform-gpu hover:scale-110 hover:rotate-12">
+                <Bookmark className="w-4 h-4" />
+              </button>
+              
+              {/* Book Cover */}
+              <div className="relative bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-100 h-40 rounded-2xl mb-3 flex items-center justify-center border border-white/50 shadow-inner overflow-hidden group-hover:shadow-lg transition-all duration-300">
+                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <BookOpen className="w-10 h-10 text-blue-300/70 drop-shadow-md transform group-hover:scale-110 transition-transform duration-300" />
+              </div>
+              
+              <h4 className="font-black text-[13px] text-slate-800 mb-0.5 truncate transition-all duration-300 group-hover:translate-x-0.5">Physics Concept {book}</h4>
+              <p className="text-[10px] text-slate-400 font-bold mb-3 flex items-center gap-1">
+                <span className="inline-block w-1 h-1 bg-blue-400 rounded-full"></span>
+                H.C. Verma
+              </p>
+              
+              <div className="flex gap-2">
+                <button className="flex-1 bg-blue-50 hover:bg-blue-600 text-blue-600 hover:text-white text-[10px] font-black py-2 rounded-xl transition-all duration-300 flex justify-center items-center gap-1 shadow-sm transform-gpu hover:translate-y-[-1px]">
+                  READ
+                </button>
+                <button className="bg-slate-50 hover:bg-slate-100 text-slate-400 p-2 rounded-xl transition-all duration-300 shadow-sm">
+                  <Download className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* Navigation Bar */}
       <div className="fixed bottom-0 left-0 w-full bg-white/80 backdrop-blur-lg border-t border-gray-200 shadow-[0_-4px_15px_rgba(0,0,0,0.05)] z-50">
