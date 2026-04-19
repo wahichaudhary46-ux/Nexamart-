@@ -1,27 +1,27 @@
-
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuthContext } from '@/components/auth-provider';
+import { auth, db } from '@/firebase/config';
+import { onAuthStateChanged } from 'firebase/auth';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { useFirestore } from '@/firebase';
-import { Camera, AlertCircle, Info, User, GraduationCap, MapPin, Sparkles, Loader2 } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
+import { Camera, AlertCircle, Info, User, GraduationCap, MapPin, Sparkles } from 'lucide-react';
 
-export default function OnboardingPage() {
+export default function Onboarding() {
   const router = useRouter();
-  const { user, userProfile, loading } = useAuthContext();
-  const db = useFirestore();
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [step, setStep] = useState(1);
 
   const [formData, setFormData] = useState({
-    fullName: '',
-    photoURL: '',
+    name: '',
+    profilePic: '',
+    email: '',
     dob: '',
     gender: '',
     admissionNo: '1',
     bio: '',
-    class: '',
+    className: '',
     exam: '',
     stream: '',
     city: '',
@@ -29,75 +29,66 @@ export default function OnboardingPage() {
     country: 'India'
   });
 
-  const [saving, setSaving] = useState(false);
-
   useEffect(() => {
-    if (!loading) {
-      if (!user) {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        setUser(currentUser);
+        setFormData((prev) => ({ ...prev, email: currentUser.email || '' }));
+        setLoading(false);
+      } else {
         router.push('/login');
-      } else if (userProfile?.isProfileComplete) {
-        router.push('/');
-      } else if (userProfile) {
-        setFormData(prev => ({
-          ...prev,
-          fullName: userProfile.fullName || '',
-          photoURL: userProfile.photoURL || '',
-        }));
       }
-    }
-  }, [user, userProfile, loading, router]);
+    });
+    return () => unsubscribe();
+  }, [router]);
 
-  const handleFinish = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formData.fullName || !formData.class) {
-      toast({
-        variant: "destructive",
-        title: "Missing Information",
-        description: "Name and Class are required fields.",
-      });
-      return;
-    }
-
-    setSaving(true);
-    try {
-      const userRef = doc(db, "users", user!.uid);
-      const updateData = {
-        ...formData,
-        isProfileComplete: true,
-        updatedAt: serverTimestamp(),
+  // फोटो सेलेक्ट करने और दिखाने का फंक्शन
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // फाइल साइज़ चेक (ऑप्शनल, ताकि डेटाबेस फुल न हो)
+      if (file.size > 2 * 1024 * 1024) {
+        alert("Photo size should be less than 2MB");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData({ ...formData, profilePic: reader.result as string });
       };
-
-      await setDoc(userRef, updateData, { merge: true });
-      
-      toast({
-        title: "Profile Completed",
-        description: "Welcome to Nexa-Library! Your portal is ready.",
-      });
-      
-      router.push('/');
-    } catch (err: any) {
-      console.error("Error saving profile:", err);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Could not save your profile. Please try again.",
-      });
-    } finally {
-      setSaving(false);
+      reader.readAsDataURL(file); // फोटो को URL में बदल रहा है
     }
   };
 
-  if (loading || !user) {
+  const handleFinish = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.name || !formData.className) {
+      alert("Name और Class भरना ज़रूरी है!");
+      return;
+    }
+
+    try {
+      await setDoc(doc(db, "students", user.uid), {
+        ...formData,
+        lastUpdated: serverTimestamp(),
+        role: 'student'
+      });
+      router.push('/profile');
+    } catch (err: any) {
+      alert("Error saving data: " + err.message);
+    }
+  };
+
+  if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 to-indigo-950 flex flex-col items-center justify-center text-white">
-        <Loader2 className="w-12 h-12 text-blue-500 animate-spin mb-4" />
-        <h2 className="font-bold tracking-widest animate-pulse">Loading setup...</h2>
+        <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <h2 className="font-bold tracking-widest animate-pulse">Setting up your profile...</h2>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 font-body py-10 px-4 flex flex-col items-center relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 font-sans py-10 px-4 flex flex-col items-center relative overflow-hidden">
       
       {/* 3D Animated Background Elements */}
       <div className="fixed inset-0 pointer-events-none">
@@ -107,6 +98,7 @@ export default function OnboardingPage() {
       </div>
 
       <div className="w-full max-w-3xl relative z-10 perspective-1000">
+        {/* Glassmorphism Card */}
         <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-6 md:p-8 transform transition-all duration-500 hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)]">
           
           <div className="text-center mb-8">
@@ -119,183 +111,180 @@ export default function OnboardingPage() {
 
           <form onSubmit={handleFinish} className="space-y-8">
             
-            {/* SECTION 1: Personal Details */}
-            <div className="space-y-4">
-              <h2 className="text-lg font-bold text-blue-300 flex items-center gap-2 border-b border-blue-500/30 pb-2">
-                <User className="w-5 h-5" /> 1. Your Details
-              </h2>
-              
-              <div className="bg-orange-500/20 border border-orange-500/40 p-4 rounded-xl flex gap-3 items-start backdrop-blur-sm">
-                <AlertCircle className="w-5 h-5 text-orange-300 flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-xs font-bold text-orange-300 uppercase">Important Restriction</p>
-                  <p className="text-xs text-orange-100/80 mt-1">Name & Profile Picture can only be updated <b>once a year</b>. Contact Library Office for corrections.</p>
+            {/* STEP 1: Personal Details */}
+            {step === 1 && (
+              <div className="space-y-4 animate-in fade-in duration-500">
+                <h2 className="text-lg font-bold text-blue-300 flex items-center gap-2 border-b border-blue-500/30 pb-2">
+                  <User className="w-5 h-5" /> 1. Your Details
+                </h2>
+                
+                <div className="bg-orange-500/20 border border-orange-500/40 p-4 rounded-xl flex gap-3 items-start backdrop-blur-sm">
+                  <AlertCircle className="w-5 h-5 text-orange-300 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-xs font-bold text-orange-300 uppercase">Important Restriction</p>
+                    <p className="text-xs text-orange-100/80 mt-1">Name & Profile Picture can only be updated <b>once a year</b>. Contact Library Office for corrections.</p>
+                  </div>
                 </div>
-              </div>
 
-              <div className="flex flex-col items-center my-4">
-                <div className="relative group cursor-pointer">
-                  <div className="w-24 h-24 bg-gradient-to-br from-gray-700 to-gray-800 rounded-2xl border-2 border-dashed border-white/30 flex items-center justify-center shadow-inner group-hover:border-blue-400 transition-all">
-                    {formData.photoURL ? (
-                      <img src={formData.photoURL} alt="Profile" className="w-full h-full object-cover rounded-2xl" />
+                <div className="flex flex-col items-center my-4">
+                  <label htmlFor="profile-upload" className="relative w-24 h-24 bg-gray-800 rounded-full border-2 border-gray-600 flex items-center justify-center cursor-pointer hover:border-blue-500 transition-all overflow-hidden shadow-lg group">
+                    {formData.profilePic ? (
+                      <img src={formData.profilePic} alt="Profile" className="w-full h-full object-cover" />
                     ) : (
-                      <Camera className="text-gray-400 w-7 h-7 group-hover:text-blue-300" />
+                      <Camera className="text-gray-400 w-8 h-8 group-hover:text-blue-400 transition-colors" />
                     )}
-                  </div>
-                  <div className="absolute -bottom-2 -right-2 bg-blue-500 rounded-full p-1.5 shadow-lg">
-                    <Camera className="w-3 h-3 text-white" />
-                  </div>
+                    <input 
+                      id="profile-upload" 
+                      type="file" 
+                      accept="image/*" 
+                      className="hidden" 
+                      onChange={handleImageChange}
+                    />
+                  </label>
+                  <span className="text-[10px] text-gray-400 mt-3 font-bold tracking-widest uppercase">Tap to Upload Photo *</span>
                 </div>
-                <span className="text-[11px] text-gray-400 mt-2">Upload Profile Photo (optional)</span>
-              </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input 
-                  type="text" 
-                  placeholder="Full Name *" 
-                  required 
-                  value={formData.fullName}
-                  className="w-full bg-white/10 border border-white/20 p-3.5 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-sm text-white placeholder:text-gray-400 transition-all"
-                  onChange={(e) => setFormData({...formData, fullName: e.target.value})} 
-                />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <input type="text" placeholder="Full Name *" required value={formData.name}
+                    className="w-full bg-white/10 border border-white/20 p-3.5 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-sm text-white placeholder:text-gray-400 transition-all"
+                    onChange={(e) => setFormData({...formData, name: e.target.value})} />
+                  
+                  <input type="email" disabled value={formData.email}
+                    className="w-full bg-white/5 border border-white/10 p-3.5 rounded-xl text-gray-400 text-sm cursor-not-allowed" />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <input type="date" value={formData.dob}
+                    className="w-full bg-white/10 border border-white/20 p-3.5 rounded-xl outline-none text-sm text-white [color-scheme:dark]"
+                    onChange={(e) => setFormData({...formData, dob: e.target.value})} />
+                  
+                  <select value={formData.gender}
+                    className="w-full bg-white/10 border border-white/20 p-3.5 rounded-xl outline-none text-sm text-white"
+                    onChange={(e) => setFormData({...formData, gender: e.target.value})}>
+                    <option value="" className="bg-gray-800">Gender</option>
+                    <option value="Male" className="bg-gray-800">Male</option>
+                    <option value="Female" className="bg-gray-800">Female</option>
+                    <option value="Other" className="bg-gray-800">Other</option>
+                  </select>
+                </div>
+
+                <textarea placeholder="Write a short bio about yourself..." value={formData.bio}
+                  className="w-full bg-white/10 border border-white/20 p-3.5 rounded-xl outline-none text-sm h-20 resize-none text-white placeholder:text-gray-400"
+                  onChange={(e) => setFormData({...formData, bio: e.target.value})} />
+
+                <button type="button" onClick={() => setStep(2)} disabled={!formData.name} 
+                  className="w-full bg-blue-600 py-4 rounded-xl font-bold disabled:opacity-50 mt-4 transition-all hover:bg-blue-700 active:scale-95 shadow-lg shadow-blue-900/20">
+                  Next Step
+                </button>
+              </div>
+            )}
+
+            {/* STEP 2: Academic Details */}
+            {step === 2 && (
+              <div className="space-y-4 animate-in slide-in-from-right duration-500">
+                <h2 className="text-lg font-bold text-blue-300 flex items-center gap-2 border-b border-blue-500/30 pb-2">
+                  <GraduationCap className="w-5 h-5" /> 2. Education Details
+                </h2>
                 
-                <input 
-                  type="email" 
-                  disabled 
-                  value={user.email || ''}
-                  className="w-full bg-white/5 border border-white/10 p-3.5 rounded-xl text-gray-400 text-sm cursor-not-allowed" 
-                />
-              </div>
+                <div className="bg-blue-500/20 border border-blue-500/30 p-3 rounded-xl flex gap-3 items-center">
+                  <Info className="w-5 h-5 text-blue-300" />
+                  <p className="text-xs text-blue-100">Library material will be customized based on your selected Class.</p>
+                </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <input 
-                  type="date" 
-                  value={formData.dob}
-                  className="w-full bg-white/10 border border-white/20 p-3.5 rounded-xl outline-none text-sm text-white [color-scheme:dark]"
-                  onChange={(e) => setFormData({...formData, dob: e.target.value})} 
-                />
-                
-                <select 
-                  value={formData.gender}
-                  className="w-full bg-white/10 border border-white/20 p-3.5 rounded-xl outline-none text-sm text-white"
-                  onChange={(e) => setFormData({...formData, gender: e.target.value})}
-                >
-                  <option value="" className="bg-gray-800">Gender</option>
-                  <option value="Male" className="bg-gray-800">Male</option>
-                  <option value="Female" className="bg-gray-800">Female</option>
-                  <option value="Other" className="bg-gray-800">Other</option>
-                </select>
-              </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <select required value={formData.className}
+                    className="w-full bg-white/10 border border-white/20 p-3.5 rounded-xl outline-none text-sm text-white"
+                    onChange={(e) => setFormData({...formData, className: e.target.value})}>
+                    <option value="" className="bg-gray-800">Select Class *</option>
+                    <option className="bg-gray-800">Class 9</option>
+                    <option className="bg-gray-800">Class 10</option>
+                    <option className="bg-gray-800">Class 11</option>
+                    <option className="bg-gray-800">Class 12</option>
+                    <option className="bg-gray-800">JEE Aspirant</option>
+                    <option className="bg-gray-800">NEET Aspirant</option>
+                    <option className="bg-gray-800">UPSC</option>
+                    <option className="bg-gray-800">Other Govt Exams</option>
+                  </select>
 
-              <textarea 
-                placeholder="Write a short bio about yourself..." 
-                value={formData.bio}
-                className="w-full bg-white/10 border border-white/20 p-3.5 rounded-xl outline-none text-sm h-20 resize-none text-white placeholder:text-gray-400"
-                onChange={(e) => setFormData({...formData, bio: e.target.value})} 
-              />
-            </div>
+                  <select value={formData.stream}
+                    className="w-full bg-white/10 border border-white/20 p-3.5 rounded-xl outline-none text-sm text-white"
+                    onChange={(e) => setFormData({...formData, stream: e.target.value})}>
+                    <option value="" className="bg-gray-800">Stream (If Applicable)</option>
+                    <option className="bg-gray-800">Science (PCM)</option>
+                    <option className="bg-gray-800">Science (PCB)</option>
+                    <option className="bg-gray-800">Commerce</option>
+                    <option className="bg-gray-800">Arts</option>
+                  </select>
+                </div>
 
-            {/* SECTION 2: Academic Details */}
-            <div className="space-y-4">
-              <h2 className="text-lg font-bold text-blue-300 flex items-center gap-2 border-b border-blue-500/30 pb-2">
-                <GraduationCap className="w-5 h-5" /> 2. Education Details
-              </h2>
-              
-              <div className="bg-blue-500/20 border border-blue-500/30 p-3 rounded-xl flex gap-3 items-center">
-                <Info className="w-5 h-5 text-blue-300" />
-                <p className="text-xs text-blue-100">Library material will be customized based on your selected Class.</p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <select 
-                  required 
-                  value={formData.class}
-                  className="w-full bg-white/10 border border-white/20 p-3.5 rounded-xl outline-none text-sm text-white"
-                  onChange={(e) => setFormData({...formData, class: e.target.value})}
-                >
-                  <option value="" className="bg-gray-800">Select Class *</option>
-                  <option className="bg-gray-800" value="Class 9">Class 9</option>
-                  <option className="bg-gray-800" value="Class 10">Class 10</option>
-                  <option className="bg-gray-800" value="Class 11">Class 11</option>
-                  <option className="bg-gray-800" value="Class 12">Class 12</option>
-                  <option className="bg-gray-800" value="JEE">JEE Aspirant</option>
-                  <option className="bg-gray-800" value="NEET">NEET Aspirant</option>
-                  <option className="bg-gray-800" value="UPSC">UPSC</option>
-                  <option className="bg-gray-800" value="Other">Other Govt Exams</option>
-                </select>
-
-                <select 
-                  value={formData.stream}
-                  className="w-full bg-white/10 border border-white/20 p-3.5 rounded-xl outline-none text-sm text-white"
-                  onChange={(e) => setFormData({...formData, stream: e.target.value})}
-                >
-                  <option value="" className="bg-gray-800">Stream (If Applicable)</option>
-                  <option className="bg-gray-800" value="Science (PCM)">Science (PCM)</option>
-                  <option className="bg-gray-800" value="Science (PCB)">Science (PCB)</option>
-                  <option className="bg-gray-800" value="Commerce">Commerce</option>
-                  <option className="bg-gray-800" value="Arts">Arts</option>
-                </select>
-              </div>
-
-              <input 
-                type="text" 
-                placeholder="Target Exam (e.g. CBSE Boards, JEE 2025)" 
-                value={formData.exam}
-                className="w-full bg-white/10 border border-white/20 p-3.5 rounded-xl outline-none text-sm text-white placeholder:text-gray-400"
-                onChange={(e) => setFormData({...formData, exam: e.target.value})} 
-              />
-
-              <div className="w-full bg-white/5 border border-white/10 p-3.5 rounded-xl flex justify-between items-center">
-                <span className="text-xs text-gray-400 font-bold">Admission Number:</span>
-                <span className="text-sm text-green-400 font-black">{formData.admissionNo}</span>
-              </div>
-              <p className="text-[10px] text-gray-500 text-right mt-1">Automatically assigned. Tracked by admin.</p>
-            </div>
-
-            {/* SECTION 3: Location Details */}
-            <div className="space-y-4">
-              <h2 className="text-lg font-bold text-blue-300 flex items-center gap-2 border-b border-blue-500/30 pb-2">
-                <MapPin className="w-5 h-5" /> 3. Location Details
-              </h2>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input 
-                  type="text" 
-                  placeholder="City" 
-                  value={formData.city}
+                <input type="text" placeholder="Target Exam (e.g. CBSE Boards, JEE 2025)" value={formData.exam}
                   className="w-full bg-white/10 border border-white/20 p-3.5 rounded-xl outline-none text-sm text-white placeholder:text-gray-400"
-                  onChange={(e) => setFormData({...formData, city: e.target.value})} 
-                />
+                  onChange={(e) => setFormData({...formData, exam: e.target.value})} />
+
+                <div className="w-full bg-white/5 border border-white/10 p-3.5 rounded-xl flex justify-between items-center">
+                  <span className="text-xs text-gray-400 font-bold">Admission Number:</span>
+                  <span className="text-sm text-green-400 font-black">{formData.admissionNo}</span>
+                </div>
                 
-                <input 
-                  type="text" 
-                  placeholder="State" 
-                  value={formData.state}
-                  className="w-full bg-white/10 border border-white/20 p-3.5 rounded-xl outline-none text-sm text-white placeholder:text-gray-400"
-                  onChange={(e) => setFormData({...formData, state: e.target.value})} 
-                />
+                <div className="flex gap-4 mt-8">
+                  <button type="button" onClick={() => setStep(1)} className="flex-1 bg-gray-700 py-4 rounded-xl font-bold transition-all hover:bg-gray-600 active:scale-95">
+                    Back
+                  </button>
+                  <button type="button" onClick={() => setStep(3)} className="flex-1 bg-blue-600 py-4 rounded-xl font-bold transition-all hover:bg-blue-700 active:scale-95 shadow-lg shadow-blue-900/20">
+                    Next
+                  </button>
+                </div>
               </div>
+            )}
 
-              <input 
-                type="text" 
-                disabled 
-                value={formData.country}
-                className="w-full bg-white/5 border border-white/10 p-3.5 rounded-xl text-gray-400 text-sm cursor-not-allowed" 
-              />
-            </div>
+            {/* STEP 3: Location Details */}
+            {step === 3 && (
+              <div className="space-y-4 animate-in slide-in-from-right duration-500">
+                <h2 className="text-lg font-bold text-blue-300 flex items-center gap-2 border-b border-blue-500/30 pb-2">
+                  <MapPin className="w-5 h-5" /> 3. Location Details
+                </h2>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <input type="text" placeholder="City" value={formData.city}
+                    className="w-full bg-white/10 border border-white/20 p-3.5 rounded-xl outline-none text-sm text-white placeholder:text-gray-400"
+                    onChange={(e) => setFormData({...formData, city: e.target.value})} />
+                  
+                  <input type="text" placeholder="State" value={formData.state}
+                    className="w-full bg-white/10 border border-white/20 p-3.5 rounded-xl outline-none text-sm text-white placeholder:text-gray-400"
+                    onChange={(e) => setFormData({...formData, state: e.target.value})} />
+                </div>
 
-            {/* Submit Button */}
-            <button 
-              type="submit" 
-              disabled={saving || !formData.fullName || !formData.class}
-              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 py-4 rounded-xl font-bold text-sm tracking-wide shadow-lg shadow-blue-900/30 transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2"
-            >
-              {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : '🚀 SAVE & ENTER LIBRARY'}
-            </button>
+                <input type="text" disabled value={formData.country}
+                  className="w-full bg-white/5 border border-white/10 p-3.5 rounded-xl text-gray-400 text-sm cursor-not-allowed" />
+
+                <div className="pt-8">
+                  <button type="submit" 
+                    className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 py-4 rounded-xl font-black text-lg shadow-lg shadow-green-900/20 transition-all transform hover:scale-[1.02] active:scale-[0.98]">
+                    FINISH & START STUDYING 🍯
+                  </button>
+                  <button type="button" onClick={() => setStep(2)} className="w-full mt-4 text-gray-500 font-bold hover:text-gray-400">
+                    Back
+                  </button>
+                </div>
+              </div>
+            )}
 
           </form>
         </div>
       </div>
+
+      <style jsx>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          50% { transform: translateY(-20px) rotate(5deg); }
+        }
+        .animate-float {
+          animation: float 10s ease-in-out infinite;
+        }
+        .perspective-1000 {
+          perspective: 1000px;
+        }
+      `}</style>
     </div>
   );
 }
