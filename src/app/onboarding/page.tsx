@@ -42,11 +42,11 @@ export default function Onboarding() {
     return () => unsubscribe();
   }, [router]);
 
-  // फोटो सेलेक्ट करने और दिखाने का फंक्शन
+  // Photo selection and preview function
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // फाइल साइज़ चेक (ऑप्शनल, ताकि डेटाबेस फुल न हो)
+      // File size check (under 2MB)
       if (file.size > 2 * 1024 * 1024) {
         alert("Photo size should be less than 2MB");
         return;
@@ -55,7 +55,7 @@ export default function Onboarding() {
       reader.onloadend = () => {
         setFormData({ ...formData, profilePic: reader.result as string });
       };
-      reader.readAsDataURL(file); // फोटो को URL में बदल रहा है
+      reader.readAsDataURL(file); // Converts photo to base64 URL
     }
   };
 
